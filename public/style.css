@@ -1,0 +1,77 @@
+/* 隱藏捲軸但允許滾動 */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* 整個 App 的捲軸也隱藏 (適用於網頁外層) */
+body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+body::-webkit-scrollbar {
+    display: none;
+}
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+/* 底部導覽列狀態切換 (Icon 實心/空心) */
+.nav-btn .icon-active {
+    display: none;
+}
+.nav-btn .icon-inactive {
+    display: block;
+}
+
+/* Active 狀態：顯示香檳金與發光效果 */
+.nav-btn.active .icon-active {
+    display: block;
+    color: #d4af37; /* Tailwind primary (Champagne Gold) */
+    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.6));
+}
+.nav-btn.active .icon-inactive {
+    display: none;
+}
+
+.nav-btn.active {
+    color: #d4af37 !important;
+}
+
+/* 頁面切換動畫 (加入尊榮沉穩感) */
+.view-section {
+    display: none;
+    animation: fadeInLuxury 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.view-section.active {
+    display: block;
+}
+
+@keyframes fadeInLuxury {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.98);
+        filter: blur(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+/* 確保底部不會被 Safe Area (iOS) 擋住 */
+.pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 24px);
+}

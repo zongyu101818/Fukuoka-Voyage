@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: fukuoka-voyage
+    env: node
+    region: singapore # 離台灣與日本近，降低延遲
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
