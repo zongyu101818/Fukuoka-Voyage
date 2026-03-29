@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "> 一款專為福岡（Fukuoka） 7 天 6 夜自由行打造的個人化行動優先 Web 應用程式 (未來可升級為 PWA )，結合了行程地圖、機票預訂管理與記帳功能，讓您的九州之旅更輕鬆！",
   "main": "app.js",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
