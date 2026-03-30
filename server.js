@@ -53,27 +53,27 @@ const db = new sqlite3.Database('./voyage.sqlite', (err) => {
                 db.get("SELECT COUNT(*) as count FROM itinerary", (err, row) => {
                     if (row && row.count === 0) {
                         const sql = 'INSERT INTO itinerary (day_num, time_str, category, title, description, image_url) VALUES (?, ?, ?, ?, ?, ?)';
-                        // DAY 1
-                        db.run(sql, [1, '10:00', '準備', '福岡機場入境', '抵達福岡機場，領取行李並前往博多市區。', 'https://images.unsplash.com/photo-1542051812871-34f21505bB8b?w=800']); 
+                        // DAY 1: 福岡機場, 櫛田神社, 中洲屋台
+                        db.run(sql, [1, '10:00', '準備', '福岡機場入境', '抵達福岡機場，領取行李並前往博多市區。', 'https://images.unsplash.com/photo-1590559899731-a382839cead5?w=800&q=80']); 
                         db.run(sql, [1, '14:00', '探險', '櫛田神社', '博多總鎮守，欣賞壯觀的裝飾山笠。', 'https://images.unsplash.com/photo-1627993079075-816d2b59ecfd?w=800']); 
                         db.run(sql, [1, '18:00', '補給', '中洲屋台街', '體驗福岡道地的路邊攤美食文化。', 'https://images.unsplash.com/photo-1616428414594-5262deee92ea?w=800']); 
-                        // DAY 2
+                        // DAY 2: 太宰府, 大濠公園, 福岡塔
                         db.run(sql, [2, '09:00', '探險', '太宰府天滿宮', '參拜學問之神並品嚐梅枝餅。', 'https://images.unsplash.com/photo-1624028373200-cba190f845ee?w=800']); 
-                        db.run(sql, [2, '15:00', '市區', '大濠公園', '在絕美的湖畔散步，享受午後陽光。', 'https://images.unsplash.com/photo-1562916186-5d2ee7762635?w=800']); 
+                        db.run(sql, [2, '15:00', '市區', '大濠公園', '在絕美的湖畔散步，享受午後陽光。', 'https://images.unsplash.com/photo-1564147772846-993a401f80ed?w=800']); 
                         db.run(sql, [2, '20:00', '夜景', '福岡塔', '登高俯瞰百道海濱公園與福岡市璀璨夜景。', 'https://plus.unsplash.com/premium_photo-1661962323385-e11232840acb?w=800']); 
-                        // DAY 3
-                        db.run(sql, [3, '09:30', '移動', '別府特急列車', '展開溫泉縣的大冒險', 'https://images.unsplash.com/photo-1549448888-29ef8b0870c9?w=800']); 
-                        db.run(sql, [3, '13:00', '探險', '別府地獄溫泉', '參觀海地獄、血池地獄等奇特自然景觀。', 'https://images.unsplash.com/photo-1574676527582-73010b4deee4?w=800']); 
-                        // DAY 4
+                        // DAY 3: 別府, 海地獄
+                        db.run(sql, [3, '09:30', '移動', '別府特急列車', '展開溫泉縣的大冒險', 'https://images.unsplash.com/photo-1618342416174-88cb15942fdf?w=800']); 
+                        db.run(sql, [3, '13:00', '探險', '別府地獄溫泉', '參觀海地獄、血池地獄等奇特自然景觀。', 'https://plus.unsplash.com/premium_photo-1678122822765-685b3db5d5f2?w=800']); 
+                        // DAY 4: 由布院
                         db.run(sql, [4, '10:00', '漫步', '由布院 湯之坪', '品嚐 B-Speak 蛋糕卷與各種特色小吃。', 'https://images.unsplash.com/photo-1582239330104-ff2ca1bf743e?w=800']); 
                         db.run(sql, [4, '16:00', '風景', '夢幻金鱗湖', '觀賞夕照與晨霧美景。', 'https://images.unsplash.com/photo-1510257321689-0ae280eb4c8a?w=800']); 
-                        // DAY 5
+                        // DAY 5: 熊本城
                         db.run(sql, [5, '11:00', '歷史', '熊本城', '日本三大名城之一，見證其龐大規模與復甦。', 'https://images.unsplash.com/photo-1596483582121-50e560f7e41d?w=800']); 
                         db.run(sql, [5, '15:00', '探險', '水前寺成趣園', '風景如畫的日式庭園。', 'https://images.unsplash.com/photo-1560965380-4d402f068222?w=800']); 
-                        // DAY 6
+                        // DAY 6: 阿蘇
                         db.run(sql, [6, '10:00', '壯闊', '阿蘇火山草千里', '近距離感受活火山魄力與無盡草原。', 'https://images.unsplash.com/photo-1591873155700-1c31f4961d15?w=800']); 
-                        // DAY 7
-                        db.run(sql, [7, '10:00', '補給', '天神地下街', '最後採買與伴手禮準備。', 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800']); 
+                        // DAY 7: 天神
+                        db.run(sql, [7, '10:00', '補給', '天神地區採買', '最後的天神地下街伴手禮大掃貨。', 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800']); 
                     }
                 });
             }
@@ -214,6 +214,13 @@ app.put('/api/checklist/:id', (req, res) => {
 });
 app.delete('/api/checklist/:id', (req, res) => {
     db.run('DELETE FROM checklist WHERE id = ?', [req.params.id], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true });
+    });
+});
+
+app.post('/api/checklist/reset', (req, res) => {
+    db.run('UPDATE checklist SET is_packed = 0', [], function(err) {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ success: true });
     });

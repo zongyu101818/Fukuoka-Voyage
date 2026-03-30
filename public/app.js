@@ -1,3 +1,4 @@
+// Update original functions
 document.addEventListener("DOMContentLoaded", () => {
     initApp();
 });
@@ -37,12 +38,12 @@ function switchTab(tabName) {
 
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('active', 'text-primary');
-        btn.classList.add('text-parchment-200', 'opacity-60');
+        btn.classList.add('text-gray-400', 'opacity-60');
     });
     const activeBtn = document.querySelector(`[data-target="view-${tabName}"]`);
     if (activeBtn) {
         activeBtn.classList.add('active', 'text-primary');
-        activeBtn.classList.remove('text-parchment-200', 'opacity-60');
+        activeBtn.classList.remove('text-gray-400', 'opacity-60');
     }
     
     if (tabName === 'itinerary') changeDay(currentDay);
@@ -148,9 +149,52 @@ function closeSettingsModal() {
 // 地圖 Modal API
 // ===================================
 function openMapModal() {
+    let defaultLocation = "九州 日本";
+    const locations = {
+        1: "福岡市區 日本",
+        2: "熊本市 日本",
+        3: "阿蘇山 日本",
+        4: "由布院 日本",
+        5: "門司港 日本",
+        6: "太宰府 日本",
+        7: "福岡機場 日本"
+    };
+    
+    let query = locations[currentDay] || defaultLocation;
+    if (window.currentItineraryRows && window.currentItineraryRows.length > 0) {
+        // 如果當日有行程，以第一個行程做為地圖搜尋起點
+        query = window.currentItineraryRows[0].title + " 日本";
+    }
+
+    document.getElementById('map-iframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=12&ie=UTF8&iwloc=&output=embed`;
+    const titleEl = document.getElementById('map-modal-title');
+    if (titleEl) titleEl.innerHTML = `<i class="ph-fill ph-map-trifold mr-2 text-xl"></i>偉大航道總覽 - DAY ${currentDay}`;
+
     document.getElementById('map-modal').classList.remove('hidden');
     setTimeout(() => { document.getElementById('map-modal-content').classList.remove('scale-95', 'opacity-0'); }, 10);
 }
+
+function openFoodMap() {
+    let query = "福岡 美食 餐廳";
+    const locations = {
+        1: "福岡 天神 美食",
+        2: "熊本城 周邊美食",
+        3: "阿蘇 周邊美食",
+        4: "由布院 美食",
+        5: "小倉 門司港 美食",
+        6: "太宰府 美食",
+        7: "福岡機場 美食"
+    };
+    query = locations[currentDay] || query;
+    
+    document.getElementById('map-iframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+    const titleEl = document.getElementById('map-modal-title');
+    if (titleEl) titleEl.innerHTML = `<i class="ph-fill ph-fork-knife mr-2 text-xl"></i>海上餐廳 - 尋找糧食`;
+
+    document.getElementById('map-modal').classList.remove('hidden');
+    setTimeout(() => { document.getElementById('map-modal-content').classList.remove('scale-95', 'opacity-0'); }, 10);
+}
+
 function closeMapModal() {
     document.getElementById('map-modal-content').classList.add('scale-95', 'opacity-0');
     setTimeout(() => document.getElementById('map-modal').classList.add('hidden'), 300);
@@ -168,6 +212,25 @@ async function fetchVoyageStatus() {
     } catch (err) {}
 }
 
+let jpyToTwdRate = 0.21;
+async function fetchExchangeRate() {
+    try {
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY');
+        const data = await res.json();
+        if(data && data.rates && data.rates.TWD) {
+            jpyToTwdRate = data.rates.TWD;
+            const rt = document.getElementById('home-exchange-rate');
+            if(rt) {
+                rt.innerText = jpyToTwdRate.toFixed(4);
+                rt.classList.add('text-secondary', 'drop-shadow-[0_0_10px_rgba(234,179,8,0.8)]');
+            }
+        }
+    } catch(err) {
+        console.warn('Real time exchange rate failed, using 0.21');
+    }
+}
+document.addEventListener('DOMContentLoaded', fetchExchangeRate);
+
 // ===================================
 // 金庫 (Expenses)
 // ===================================
@@ -181,7 +244,7 @@ async function fetchExpenses() {
         let total = 0;
 
         if (expenses.length === 0) {
-            listEl.innerHTML = '<p class="text-center font-bold text-wood-600 py-6">金庫目前空空如也...</p>';
+            listEl.innerHTML = '<p class="text-center font-bold text-gray-400 py-6">金庫目前空空如也...</p>';
         } else {
             expenses.forEach((item, index) => {
                 total += item.amount;
@@ -195,15 +258,15 @@ async function fetchExpenses() {
                 const escArgs = safeTitle.replace(/'/g, "\\'");
 
                 const html = `
-                    <div onclick="openExpenseModal('${item.id}', '${escArgs}', ${item.amount})" class="bg-white/90 p-3 rounded border-2 border-wood-800 shadow-[2px_2px_0_rgba(69,26,3,1)] flex items-center gap-3 transform ${rotateClass} cursor-pointer hover:bg-parchment-100 transition active:scale-95">
-                        <div class="w-12 h-12 ${colorClass} border-2 border-wood-800 text-white flex items-center justify-center shrink-0">${icon}</div>
+                    <div onclick="openExpenseModal('${item.id}', '${escArgs}', ${item.amount})" class="bg-dark-200/40 backdrop-blur-md p-3 rounded border border-primary/20 border-white/10 shadow-lg flex items-center gap-3 transform ${rotateClass} cursor-pointer hover:bg-dark-300 transition active:scale-95">
+                        <div class="w-12 h-12 ${colorClass} border border-primary/20 border-white/10 text-white flex items-center justify-center shrink-0">${icon}</div>
                         <div class="flex-1">
-                            <h4 class="font-black text-wood-900">${safeTitle}</h4>
-                            <p class="text-[10px] font-bold text-wood-600">${dateString}</p>
+                            <h4 class="font-bold tracking-wider text-gray-100">${safeTitle}</h4>
+                            <p class="text-[10px] font-bold text-gray-400">${dateString}</p>
                         </div>
                         <div class="text-right">
-                            <p class="font-black text-xl text-wood-900 mb-0.5">฿ ${item.amount.toLocaleString()}</p>
-                            <p class="text-[10px] font-bold text-primary">~ NT$ ${Math.round(item.amount * 0.21).toLocaleString()}</p>
+                            <p class="font-bold tracking-wider text-xl text-gray-100 mb-0.5">฿ ${item.amount.toLocaleString()}</p>
+                            <p class="text-[10px] font-bold text-primary">~ NT$ ${Math.round(item.amount * jpyToTwdRate).toLocaleString()}</p>
                         </div>
                     </div>`;
                 listEl.insertAdjacentHTML('beforeend', html);
@@ -265,16 +328,16 @@ let currentDay = 1;
 
 async function changeDay(day) {
     currentDay = day;
-    // 重設全部 Tab 樣式 (Inactive: 白底/灰底)
+    // 重設全部 Tab 樣式 (Inactive: 暗底)
     document.querySelectorAll('.day-tab').forEach(tab => {
-        tab.classList.remove('bg-primary', 'text-white', 'border-wood-800');
-        tab.classList.add('bg-parchment-200', 'text-wood-600', 'border-wood-700', 'opacity-80');
+        tab.classList.remove('bg-gradient-to-r', 'from-secondary', 'to-yellow-600', 'text-dark-400', 'shadow-[0_0_15px_rgba(234,179,8,0.6)]', 'font-black', 'scale-105', 'border-secondary');
+        tab.classList.add('bg-dark-200/80', 'backdrop-blur-xl', 'text-gray-400', 'border-white/20', 'opacity-80', 'font-bold');
     });
-    // 設定當下的 Tab (Active: 紅底)
+    // 設定當下的 Tab (Active: 黃金漸層)
     const activeTab = document.getElementById(`tab-day-${day}`);
     if (activeTab) {
-        activeTab.classList.remove('bg-parchment-200', 'text-wood-600', 'border-wood-700', 'opacity-80');
-        activeTab.classList.add('bg-primary', 'text-white', 'border-wood-800');
+        activeTab.classList.remove('bg-dark-200/80', 'backdrop-blur-xl', 'text-gray-400', 'border-white/20', 'opacity-80', 'font-bold');
+        activeTab.classList.add('bg-gradient-to-r', 'from-secondary', 'to-yellow-600', 'text-dark-400', 'border-secondary', 'shadow-[0_0_15px_rgba(234,179,8,0.6)]', 'font-black', 'scale-105');
     }
 
     try {
@@ -283,10 +346,10 @@ async function changeDay(day) {
         window.currentItineraryRows = rows; // 存到全域供 Modal 抓取
         
         const listEl = document.getElementById('itinerary-list');
-        listEl.innerHTML = '<div class="absolute left-[13px] top-6 bottom-0 w-0 border-l-4 border-dashed border-wood-500"></div>';
+        listEl.innerHTML = '<div class="absolute left-[13px] top-6 bottom-0 w-0 border-l-2 border-dashed border-white/5"></div>';
         
         if (rows.length === 0) {
-            listEl.innerHTML += '<p class="text-center font-bold text-wood-600 py-6">當日目前沒有安排航線！</p>';
+            listEl.innerHTML += '<p class="text-center font-bold text-gray-400 py-6">當日目前沒有安排航線！</p>';
         } else {
             rows.forEach((item, index) => {
                 const sTitle = escapeHTML(item.title);
@@ -299,20 +362,20 @@ async function changeDay(day) {
                 // 完全不使用 onclick 字串傳遞，直接傳 Array Index，避免所有跳脫字元錯誤！
                 const html = `
                     <div class="relative cursor-pointer transition transform hover:-translate-y-1 active:scale-95" onclick="openItineraryDetailByIndex(${index})">
-                        <div class="absolute -left-[35px] top-3 w-6 h-6 bg-parchment-100 text-primary border-2 border-wood-800 rounded-full flex items-center justify-center z-10 shadow-wanted-sm">
-                            <i class="ph-fill ph-anchor-simple text-sm font-black"></i>
+                        <div class="absolute -left-[35px] top-3 w-6 h-6 bg-dark-300 text-primary border border-primary/20 border-white/10 rounded-full flex items-center justify-center z-10 shadow-wanted-sm">
+                            <i class="ph-fill ph-anchor-simple text-sm font-bold tracking-wider"></i>
                         </div>
-                        <div class="bg-white/90 p-4 rounded-xl border-2 border-wood-800 shadow-wanted relative overflow-hidden group">
+                        <div class="bg-dark-200/40 backdrop-blur-md p-4 rounded-xl border border-primary/20 border-white/10 shadow-wanted relative overflow-hidden group">
                             <div class="absolute inset-0 bg-cover bg-center opacity-10 pointer-events-none" style="background-image:url('${sUrl}'), url('${fallbackUrl}')"></div>
                             
                             <div class="flex justify-between items-center mb-2 pr-2 relative z-10">
-                                <span class="text-sm font-black text-primary">${sTime}</span>
-                                <span class="text-[10px] font-bold bg-secondary text-wood-900 border border-wood-900 px-2 py-0.5 rounded transform -rotate-2">${sCat}</span>
+                                <span class="text-sm font-bold tracking-wider text-primary">${sTime}</span>
+                                <span class="text-[10px] font-bold bg-secondary text-gray-100 border border-white/10 px-2 py-0.5 rounded transform -rotate-2">${sCat}</span>
                             </div>
-                            <h3 class="font-black text-wood-900 text-lg relative z-10 flex items-center justify-between">
+                            <h3 class="font-bold tracking-wider text-gray-100 text-lg relative z-10 flex items-center justify-between">
                                 ${sTitle} <i class="ph-bold ph-caret-right text-wood-400 opacity-0 group-hover:opacity-100 transition"></i>
                             </h3>
-                            <p class="text-xs text-wood-600 mt-1 truncate relative z-10">${sDesc}</p>
+                            <p class="text-xs text-gray-400 mt-1 truncate relative z-10">${sDesc}</p>
                         </div>
                     </div>`;
                 listEl.insertAdjacentHTML('beforeend', html);
@@ -421,17 +484,17 @@ async function fetchChecklist() {
         const rows = await res.json();
         const listEl = document.getElementById('checklist-list');
         listEl.innerHTML = '';
-        if(rows.length === 0) listEl.innerHTML = '<p class="text-center font-bold text-wood-600">空空如也，尚未準備裝備</p>';
+        if(rows.length === 0) listEl.innerHTML = '<p class="text-center font-bold text-gray-400">空空如也，尚未準備裝備</p>';
         rows.forEach(item => {
             const checkedAttr = item.is_packed ? 'checked' : '';
-            const textStyle = item.is_packed ? 'line-through opacity-50' : 'text-wood-900';
+            const textStyle = item.is_packed ? 'line-through opacity-50' : 'text-gray-100';
             const html = `
-                <div class="flex items-center justify-between bg-white/60 p-3 rounded-xl border-2 border-wood-800 shadow-[2px_2px_0_rgba(69,26,3,1)]">
+                <div class="flex items-center justify-between bg-dark-200/40 backdrop-blur-md p-3 rounded-xl border border-primary/20 border-white/10 shadow-lg">
                     <label class="flex items-center gap-3 cursor-pointer flex-1">
-                        <input type="checkbox" ${checkedAttr} onchange="toggleChecklist('${item.id}', this.checked)" class="w-6 h-6 border-2 border-wood-800 rounded text-primary focus:ring-primary focus:ring-2">
-                        <span class="font-black text-lg ${textStyle} transition-all">${escapeHTML(item.item_name)}</span>
+                        <input type="checkbox" ${checkedAttr} onchange="toggleChecklist('${item.id}', this.checked)" class="w-6 h-6 border border-primary/20 border-white/10 rounded text-primary focus:ring-primary focus:ring-2">
+                        <span class="font-bold tracking-wider text-lg ${textStyle} transition-all">${escapeHTML(item.item_name)}</span>
                     </label>
-                    <button onclick="deleteChecklist('${item.id}')" class="text-wood-500 hover:text-primary ml-2 transition active:scale-95"><i class="ph-bold ph-trash text-2xl"></i></button>
+                    <button onclick="deleteChecklist('${item.id}')" class="text-gray-500 hover:text-primary ml-2 transition active:scale-95"><i class="ph-bold ph-trash text-2xl"></i></button>
                 </div>
             `;
             listEl.insertAdjacentHTML('beforeend', html);
@@ -459,5 +522,11 @@ async function toggleChecklist(id, is_packed) {
 
 async function deleteChecklist(id) {
     await fetch(`/api/checklist/${id}`, { method: 'DELETE' });
+    fetchChecklist();
+}
+
+async function resetChecklist() {
+    if (!confirm("確定要清空所有已打包的項目，重新整理行囊嗎？（未完成清單保留）")) return;
+    await fetch('/api/checklist/reset', { method: 'POST' });
     fetchChecklist();
 }

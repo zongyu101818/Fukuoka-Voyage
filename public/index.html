@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
     <!-- PWA (讓手機可以把網頁加入主畫面變成 APP) 設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,13 +14,13 @@
     <!-- APP Icon (使用隨機海賊風或羅盤Icon做代表) -->
     <link rel="apple-touch-icon" href="https://img.icons8.com/plasticine/120/compass--v2.png">
 
-    <title>九州 7天6夜 偉大航道之旅</title>
-    
+    <title>福岡 7天6夜 偉大航道之旅</title>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&display=swap" rel="stylesheet">
+
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
@@ -28,121 +30,273 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['"Noto Sans TC"', 'sans-serif'] },
-                    colors: {
-                        primary: '#dc2626', secondary: '#eab308', ocean: '#0284c7', 
-                        wood: { 500: '#a16207', 700: '#713f12', 800: '#451a03', 900: '#290f01' },
-                        parchment: { 100: '#fef3c7', 200: '#fde68a', 300: '#fcd34d' }
-                    },
-                    boxShadow: { 'wanted': '4px 4px 0px rgba(69, 26, 3, 1)', 'wanted-sm': '2px 2px 0px rgba(69, 26, 3, 1)', 'nav': '0 -4px 15px rgba(0, 0, 0, 0.15)' }
+                    fontFamily: { sans: ['"Noto Serif TC"', 'serif'] },
+                    colors: { primary: '#7e22ce', secondary: '#eab308', ocean: '#1e3a8a', dark: { 100: '#2a1b42', 200: '#130f25', 300: '#090614', 400: '#05020a' }, gold: '#fbbf24' },
+                    boxShadow: { 'wanted': '0 10px 40px -10px rgba(126, 34, 206, 0.4)', 'wanted-sm': '0 4px 20px -5px rgba(234, 179, 8, 0.3)', 'nav': '0 -15px 40px rgba(0, 0, 0, 0.9)' }
                 }
             }
         }
     </script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-800 text-wood-800 antialiased font-sans selection:bg-secondary selection:text-wood-900">
 
-    <div id="app-container" class="relative max-w-md mx-auto h-[100dvh] bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] bg-parchment-100 overflow-hidden flex flex-col shadow-2xl sm:border-4 sm:border-wood-800 sm:rounded-[2rem] sm:h-[90vh] sm:my-[5vh]">
-        
+<body class="bg-dark-400 text-gray-200 antialiased font-sans selection:bg-secondary selection:text-gray-100">
+
+    <div id="app-container"
+        class="relative max-w-md mx-auto h-[100dvh] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] bg-dark-400 bg-dark-300 overflow-hidden flex flex-col shadow-2xl sm:border border-primary/20 sm:border-white/10 sm:rounded-2xl sm:h-[90vh] sm:my-[5vh]">
+        <div class="lightning-flash"></div>
+
         <!-- Header -->
-        <header class="bg-primary border-b-4 border-wood-800 p-5 shadow-wanted z-10 shrink-0 relative overflow-hidden">
-            <i class="ph-fill ph-skull absolute -right-6 -bottom-6 text-9xl text-white opacity-10 rotate-12"></i>
+        <header class="border-b border-white/10 p-5 shadow-wanted z-10 shrink-0 relative overflow-hidden" style="min-height: 140px;">
+            <!-- Zoro Background Image -->
+            <img src="https://i.pinimg.com/originals/84/6c/d6/846cd688de4a2f49a9d58fc207188522.jpg" alt="" class="absolute inset-0 w-full h-full object-cover object-[70%_20%] opacity-50 pointer-events-none select-none" style="filter: saturate(0.8) brightness(0.7);">
+            <!-- Colored overlay for depth -->
+            <div class="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/60 to-transparent pointer-events-none"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-300/80 via-transparent to-transparent pointer-events-none"></div>
             <div class="flex justify-between items-center mb-5 relative z-10">
                 <div>
-                    <h1 class="text-3xl font-black tracking-widest text-secondary drop-shadow-[2px_2px_0_rgba(69,26,3,1)]">FUKUOKA</h1>
-                    <p class="text-white font-bold mt-1 uppercase tracking-widest text-xs drop-shadow-[1px_1px_0_rgba(69,26,3,1)]">Kyushu Loop: 7 Days</p>
+                    <h1
+                        class="text-3xl font-bold tracking-wider tracking-widest text-secondary drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                        FUKUOKA</h1>
+                    <p
+                        class="text-white font-bold mt-1 uppercase tracking-widest text-xs drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] border-l-2 border-secondary pl-2">
+                        Kyushu Loop: 7 Days</p>
                 </div>
                 <!-- 船長設定按鈕 -->
-                <div onclick="openSettingsModal()" class="w-12 h-12 rounded-full border-4 border-wood-800 bg-secondary flex items-center justify-center cursor-pointer shadow-wanted-sm transform transition hover:scale-105 hover:rotate-6 active:scale-95">
-                    <i class="ph-fill ph-skull text-wood-800 text-xl"></i>
+                <div onclick="openSettingsModal()"
+                    class="w-12 h-12 rounded-full border-2 border-secondary bg-dark-200 flex items-center justify-center cursor-pointer shadow-[0_0_15px_rgba(234,179,8,0.5)] transform transition hover:scale-105 hover:rotate-6 active:scale-95 overflow-hidden">
+                    <img src="zoro-avatar.jpg" alt="Settings" class="w-full h-full object-cover">
                 </div>
             </div>
-            
-            <div class="bg-parchment-200 border-2 border-wood-800 rounded-xl p-3 flex justify-between items-center shadow-wanted-sm relative overflow-hidden">
-                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-10"></div>
-                <div class="flex flex-col relative z-10">
-                    <span class="text-xs font-black text-wood-700">起航出發</span>
-                    <span class="font-black text-xl text-wood-900 mt-0.5">DAY 1</span>
+
+            <div
+                class="bg-dark-200/80 backdrop-blur-xl border border-primary/20 border-white/10 rounded-xl p-3 flex justify-between items-center shadow-wanted-sm relative overflow-hidden group hover:bg-parchment-300 transition-colors cursor-pointer" onclick="document.getElementById('boat-icon').classList.toggle('translate-x-12')">
+                <div
+                    class="absolute inset-0 bg-gradient-to-br from-dark-100/50 to-dark-300/50 opacity-10">
                 </div>
-                <div class="flex flex-col items-center relative z-10">
-                    <i class="ph-fill ph-boat text-primary text-2xl mb-1"></i>
-                    <span class="text-[10px] bg-wood-800 text-secondary px-3 py-1 rounded-full font-black tracking-widest border-2 border-wood-900">千陽號</span>
+                <div class="flex flex-col relative z-10">
+                    <span class="text-xs font-bold tracking-wider text-gray-300">起航出發</span>
+                    <span class="font-bold tracking-wider text-xl text-gray-100 mt-0.5">DAY 1</span>
+                </div>
+                <!-- Animated Boat Section -->
+                <div class="flex flex-col items-center relative z-10 flex-1 px-4">
+                    <div class="w-full h-[2px] border-t-2 border-dashed border-wood-400 absolute top-1/2 left-0 -z-10 opacity-50"></div>
+                    <i id="boat-icon" class="ph-fill ph-boat text-primary text-3xl mb-1 transform transition-all duration-1000 animate-[bounce_3s_infinite]"></i>
+                    <span
+                        class="text-[10px] bg-dark-100/90 backdrop-blur-md text-secondary px-3 py-1 rounded-full font-bold tracking-wider tracking-widest border border-primary/20 border-white/10 shadow-sm transition-transform group-hover:scale-110">千陽號</span>
                 </div>
                 <div class="flex flex-col text-right relative z-10">
-                    <span class="text-xs font-black text-wood-700">滿載而歸</span>
-                    <span class="font-black text-xl text-wood-900 mt-0.5">DAY 7</span>
+                    <span class="text-xs font-bold tracking-wider text-gray-300">滿載而歸</span>
+                    <span class="font-bold tracking-wider text-xl text-gray-100 mt-0.5">DAY 7</span>
                 </div>
             </div>
         </header>
 
         <!-- Main Content Area -->
         <main class="flex-1 overflow-y-auto overflow-x-hidden p-5 pb-24 custom-scrollbar" id="main-content">
-            
+
+        <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+            <div class="ember" style="left: 10%; animation-duration: 10s;"></div>
+            <div class="ember" style="left: 30%; animation-duration: 15s; animation-delay: 2s;"></div>
+            <div class="ember" style="left: 70%; animation-duration: 12s; animation-delay: 5s;"></div>
+            <div class="ember" style="left: 85%; animation-duration: 9s; animation-delay: 1s;"></div>
+        </div>
+
+
             <!-- VIEW: HOME (首頁) -->
             <div id="view-home" class="view-section active space-y-5">
-                <div class="bg-parchment-200 border-2 border-wood-800 rounded-2xl p-4 shadow-wanted">
+                <div class="bg-dark-200/80 backdrop-blur-xl border border-primary/20 border-white/10 rounded-2xl p-4 shadow-wanted">
                     <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 rounded-full bg-primary border-4 border-wood-800 text-secondary flex items-center justify-center shadow-wanted-sm">
-                            <i class="ph-fill ph-anchor text-3xl"></i>
+                        <div
+                            class="w-16 h-16 shrink-0 rounded-full bg-dark-300 border-2 border-secondary shadow-[0_0_20px_rgba(234,179,8,0.6)] overflow-hidden p-0 relative">
+                            <img src="zoro-countdown.jpg" alt="Zoro" class="absolute inset-0 w-full h-full object-cover object-top">
                         </div>
                         <div>
-                            <h2 class="text-sm text-wood-700 font-bold uppercase tracking-widest">距離偉大航道出發</h2>
-                            <p class="text-2xl font-black text-wood-900 mt-1"><span id="countdown-days">--</span> <span class="text-sm font-bold text-wood-700">Days</span></p>
+                            <h2 class="text-sm text-gray-300 font-bold uppercase tracking-widest">距離偉大航道出發</h2>
+                            <p class="text-2xl font-bold tracking-wider text-gray-100 mt-1"><span id="countdown-days">--</span> <span
+                                    class="text-sm font-bold text-gray-300">Days</span></p>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex gap-4">
-                    <!-- 氣象局方塊，加上點擊開啟天氣 Modal 的功能 -->
-                    <div onclick="openWeatherModal()" class="cursor-pointer flex-1 bg-ocean border-2 border-wood-800 rounded-2xl p-4 text-white shadow-wanted relative overflow-hidden transform transition hover:scale-105 active:scale-95">
-                        <i class="ph-fill ph-cloud-sun absolute -right-3 -bottom-3 text-7xl text-white opacity-40"></i>
-                        <h3 class="text-sm font-black drop-shadow-md">娜美氣象局(福岡)</h3>
-                        <div class="flex items-end gap-2 mt-2 relative z-10">
-                            <span class="text-3xl font-black drop-shadow-md" id="home-weather-temp">--°</span>
-                            <span class="text-xs mb-1 font-bold" id="home-weather-desc">連線中</span>
+                    <!-- Weather & Budget -->
+                    <div onclick="openWeatherModal()"
+                        class="bg-ocean/90 border border-ocean shadow-lg rounded-xl p-4 text-white flex justify-between items-end relative overflow-hidden cursor-pointer hover:scale-[1.02] active:scale-95 transition-all group">
+                        <i class="ph-fill ph-cloud-sun text-8xl absolute -right-6 -bottom-6 opacity-30 group-hover:rotate-12 transition-transform"></i>
+                        <div class="relative z-10 w-full">
+                            <h3 class="text-sm font-bold tracking-wider mb-2 drop-shadow-sm flex items-center"><i class="ph-bold ph-thermometer mr-1"></i> 娜美氣象局(福岡)</h3>
+                            <div class="flex items-end gap-2">
+                                <span class="text-4xl font-bold tracking-wider drop-shadow-md" id="home-weather-temp">--°</span>
+                                <span class="text-sm font-bold tracking-wider mb-1" id="home-weather-desc">讀取中</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex-1 bg-parchment-200 border-2 border-wood-800 rounded-2xl p-4 shadow-wanted flex flex-col justify-center relative">
-                        <i class="ph-fill ph-coins absolute -right-2 -bottom-2 text-6xl text-wood-800 opacity-10"></i>
-                        <h3 class="text-sm text-wood-700 font-black">目前匯率</h3>
-                        <p class="text-xl font-black text-wood-900 mt-1"><span class="text-xs text-wood-500">¥1 = </span>0.21<span class="text-xs text-wood-500"> NTD</span></p>
+
+                    <div onclick="fetchExchangeRate()"
+                        class="bg-gradient-to-br from-dark-100 to-dark-300 border border-white/10 shadow-lg rounded-xl p-4 flex flex-col justify-end text-right relative overflow-hidden cursor-pointer hover:scale-[1.02] active:scale-95 transition-all group">
+                        <i class="ph-fill ph-coins text-7xl absolute -right-4 -bottom-4 opacity-20 group-hover:-rotate-12 transition-transform"></i>
+                        <div class="relative z-10">
+                            <h3 class="text-xs font-bold tracking-wider text-primary/50 mb-1 flex items-center justify-end"><i class="ph-bold ph-currency-circle-dollar mr-1"></i> 目前匯率 (點擊更新)</h3>
+                            <div class="flex items-end justify-end gap-1 font-bold tracking-wider">
+                                <span class="text-sm text-gray-400">¥1 =</span>
+                                <span class="text-3xl font-bold tracking-wider text-gray-100 drop-shadow-sm transition-all" id="home-exchange-rate">0.21</span>
+                                <span class="text-sm text-gray-400">NTD</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <h3 class="text-lg font-black text-wood-900 mt-7 mb-3 border-b-4 border-primary inline-block pb-1">航海指令</h3>
-                <div class="grid grid-cols-4 gap-3">
-                    <button onclick="switchTab('itinerary'); changeDay(1);" class="flex flex-col items-center gap-2 group transform transition hover:-translate-y-1"><div class="w-14 h-14 rounded-xl bg-parchment-200 border-2 border-wood-800 shadow-wanted-sm flex items-center justify-center text-primary"><i class="ph-fill ph-scroll text-3xl"></i></div><span class="text-xs font-bold text-wood-800">入國許可</span></button>
-                    <button onclick="openMapModal()" class="flex flex-col items-center gap-2 group transform transition hover:-translate-y-1"><div class="w-14 h-14 rounded-xl bg-parchment-200 border-2 border-wood-800 shadow-wanted-sm flex items-center justify-center text-primary"><i class="ph-fill ph-train-regional text-3xl"></i></div><span class="text-xs font-bold text-wood-800">海上列車</span></button>
-                    <button onclick="switchTab('checklist')" class="flex flex-col items-center gap-2 group transform transition hover:-translate-y-1"><div class="w-14 h-14 rounded-xl bg-parchment-200 border-2 border-wood-800 shadow-wanted-sm flex items-center justify-center text-primary"><i class="ph-fill ph-storefront text-3xl"></i></div><span class="text-xs font-bold text-wood-800">裝備庫</span></button>
-                    <button onclick="openSettingsModal()" class="flex flex-col items-center gap-2 group transform transition hover:-translate-y-1"><div class="w-14 h-14 rounded-xl bg-parchment-200 border-2 border-wood-800 shadow-wanted-sm flex items-center justify-center text-primary"><i class="ph-fill ph-tent text-3xl"></i></div><span class="text-xs font-bold text-wood-800">船長室</span></button>
+                <h3 class="text-lg font-bold tracking-wider text-gray-100 mt-7 mb-3 border-b border-primary inline-block pb-1">航海指令
+                </h3>
+                <div class="grid grid-cols-5 gap-2">
+                    <button onclick="switchTab('itinerary'); changeDay(1);"
+                        class="flex flex-col items-center gap-1 group transform transition hover:-translate-y-1 active:scale-95">
+                        <div
+                            class="w-14 h-14 rounded-xl bg-dark-200/80 backdrop-blur-xl border border-primary/20 border-white/10 shadow-wanted-sm flex items-center justify-center text-primary">
+                            <i class="ph-fill ph-scroll text-3xl"></i></div><span
+                            class="text-[10px] font-bold text-gray-200 break-keep text-center w-full">入國許可</span>
+                    </button>
+                    <button onclick="openFoodMap()"
+                        class="flex flex-col items-center gap-1 group transform transition hover:-translate-y-1 active:scale-95">
+                        <div
+                            class="w-14 h-14 rounded-xl bg-dark-200/80 backdrop-blur-xl border border-primary/20 border-white/10 shadow-wanted-sm flex items-center justify-center text-primary">
+                            <i class="ph-fill ph-fork-knife text-3xl"></i></div><span
+                            class="text-[10px] font-bold text-gray-200 break-keep text-center w-full">海上餐廳</span>
+                    </button>
+                    <button onclick="openMapModal()"
+                        class="flex flex-col items-center gap-1 group transform transition hover:-translate-y-1 active:scale-95">
+                        <div
+                            class="w-14 h-14 rounded-xl bg-dark-200/80 backdrop-blur-xl border border-primary/20 border-white/10 shadow-wanted-sm flex items-center justify-center text-primary">
+                            <i class="ph-fill ph-train-regional text-3xl"></i></div><span
+                            class="text-[10px] font-bold text-gray-200 break-keep text-center w-full">海上列車</span>
+                    </button>
+                    <button onclick="switchTab('checklist')"
+                        class="flex flex-col items-center gap-1 group transform transition hover:-translate-y-1 active:scale-95">
+                        <div
+                            class="w-14 h-14 rounded-xl bg-dark-200/80 backdrop-blur-xl border border-primary/20 border-white/10 shadow-wanted-sm flex items-center justify-center text-primary">
+                            <i class="ph-fill ph-storefront text-3xl"></i></div><span
+                            class="text-[10px] font-bold text-gray-200 break-keep text-center w-full">裝備庫</span>
+                    </button>
+                    <button onclick="openSettingsModal()"
+                        class="flex flex-col items-center gap-1 group transform transition hover:-translate-y-1 active:scale-95">
+                        <div
+                            class="w-14 h-14 rounded-xl bg-dark-200/80 backdrop-blur-xl border border-primary/20 border-white/10 shadow-wanted-sm flex items-center justify-center text-primary">
+                            <i class="ph-fill ph-tent text-3xl"></i></div><span
+                            class="text-[10px] font-bold text-gray-200 break-keep text-center w-full">船長室</span>
+                    </button>
+                </div>
+                
+                <!-- 補充空間的船長備忘錄 - 滾動式卡片 -->
+                <div class="flex items-center justify-between mt-7 mb-3 border-l-2 border-ocean pl-2">
+                    <h3 class="text-lg font-bold tracking-wider text-gray-100">船長室佈告欄</h3>
+                    <i class="ph-bold ph-arrows-left-right text-gray-400 animate-pulse text-sm"></i>
+                </div>
+                
+                <div class="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory custom-scrollbar px-1">
+                    <!-- Memo 1: 動畫彩蛋 (大尺寸顏示) -->
+                    <div class="min-w-[90%] sm:min-w-[340px] h-56 snap-center shrink-0 bg-dark-300 border border-purple-500/50 border-l-4 border-l-purple-500 rounded-xl shadow-[0_0_25px_rgba(168,85,247,0.4)] relative overflow-hidden">
+                        <!-- Video fills entire card -->
+                        <video src="zoro-gif.mp4" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover opacity-90"></video>
+                        <!-- Gradient overlay for text readability -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                        <!-- Text badge at bottom -->
+                        <div class="absolute bottom-0 left-0 right-0 p-4 flex gap-3 items-end z-10">
+                            <div class="w-9 h-9 shrink-0 bg-purple-600 rounded-full flex items-center justify-center shadow-[0_0_12px_rgba(168,85,247,0.9)] border border-white/20">
+                                <i class="ph-fill ph-sword text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold tracking-wider text-white mb-0.5 drop-shadow-[0_0_8px_rgba(168,85,247,1)]">鬼氣・九倀流</h4>
+                                <p class="text-[11px] text-purple-200 font-bold">阿修羅 拔劍！準備開始討伐！</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Memo 2: 食物 -->
+                    <div class="min-w-[85%] sm:min-w-[300px] snap-center shrink-0 bg-dark-100/90 backdrop-blur-md border border-white/10 border-l-4 border-l-ocean p-4 rounded-xl shadow-lg relative overflow-hidden group hover:scale-[1.02] active:scale-95 transition-all duration-300 cursor-pointer">
+                        <i class="ph-fill ph-treasure-chest absolute text-8xl text-ocean/10 -bottom-2 -right-2 transition-transform group-hover:rotate-12 duration-500"></i>
+                        <div class="relative z-10 flex gap-3 items-center">
+                            <div class="w-10 h-10 shrink-0 bg-ocean rounded-full flex items-center justify-center font-bold shadow-lg border border-white/10 group-hover:scale-110 transition-transform">
+                                <i class="ph-fill ph-wine text-xl text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-[13px] font-bold tracking-wider text-gray-100 mb-0.5">準備大吃大喝？</h4>
+                                <p class="text-[10px] text-gray-400 leading-relaxed">記得使用上面「海上餐廳」的羅盤，尋找附近的海賊據點和肉！</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Memo 3: 匯率 -->
+                    <div class="min-w-[85%] sm:min-w-[300px] snap-center shrink-0 bg-dark-100/90 backdrop-blur-md border border-white/10 border-l-4 border-l-secondary p-4 rounded-xl shadow-lg relative overflow-hidden group hover:scale-[1.02] active:scale-95 transition-all duration-300 cursor-pointer">
+                        <i class="ph-fill ph-coin absolute text-8xl text-secondary/10 -bottom-2 -right-2 transition-transform group-hover:rotate-12 duration-500"></i>
+                        <div class="relative z-10 flex gap-3 items-center">
+                            <div class="w-10 h-10 shrink-0 bg-secondary rounded-full flex items-center justify-center font-bold shadow-lg border border-white/10 group-hover:scale-110 transition-transform">
+                                <i class="ph-bold ph-currency-jpy text-xl text-dark-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-[13px] font-bold tracking-wider text-gray-100 mb-0.5">匯率即時監控中！</h4>
+                                <p class="text-[10px] text-gray-400 leading-relaxed">現在所有的記帳都會馬上連線抓取日幣最新的匯率喔！</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- VIEW: ITINERARY (航海日誌) -->
             <div id="view-itinerary" class="view-section hidden space-y-4">
                 <div class="flex justify-between items-end mb-5">
-                    <h2 class="text-2xl font-black text-wood-900 drop-shadow-sm">航海日誌</h2>
-                    <span onclick="openMapModal()" class="text-xs font-black text-wood-900 bg-secondary border-2 border-wood-800 px-3 py-1.5 rounded-full shadow-wanted-sm flex items-center cursor-pointer transition hover:-translate-y-1 active:scale-95"><i class="ph-fill ph-map-trifold mr-1"></i>偉大航道地圖</span>
+                    <h2 class="text-2xl font-bold tracking-wider text-gray-100 drop-shadow-sm">航海日誌</h2>
+                    <span onclick="openMapModal()"
+                        class="text-xs font-bold tracking-wider text-gray-100 bg-secondary border border-primary/20 border-white/10 px-3 py-1.5 rounded-full shadow-wanted-sm flex items-center cursor-pointer transition hover:-translate-y-1 active:scale-95"><i
+                            class="ph-fill ph-map-trifold mr-1"></i>偉大航道地圖</span>
                 </div>
-                
-                <!-- Day Tabs (統一加入 border-2 與基礎樣式) -->
-                <div class="flex overflow-x-auto gap-3 pb-4 hide-scrollbar px-1" id="day-tabs">
-                    <button onclick="changeDay(1)" id="tab-day-1" class="day-tab shrink-0 px-4 py-2 rounded-xl text-center shadow-wanted transform transition -rotate-1 border-2"><p class="text-sm font-black">DAY 1</p></button>
-                    <button onclick="changeDay(2)" id="tab-day-2" class="day-tab shrink-0 px-4 py-2 rounded-xl text-center shadow-wanted transform transition rotate-1 border-2"><p class="text-sm font-black">DAY 2</p></button>
-                    <button onclick="changeDay(3)" id="tab-day-3" class="day-tab shrink-0 px-4 py-2 rounded-xl text-center shadow-wanted transform transition -rotate-1 border-2"><p class="text-sm font-black">DAY 3</p></button>
-                    <button onclick="changeDay(4)" id="tab-day-4" class="day-tab shrink-0 px-4 py-2 rounded-xl text-center shadow-wanted transform transition rotate-1 border-2"><p class="text-sm font-black">DAY 4</p></button>
-                    <button onclick="changeDay(5)" id="tab-day-5" class="day-tab shrink-0 px-4 py-2 rounded-xl text-center shadow-wanted transform transition -rotate-1 border-2"><p class="text-sm font-black">DAY 5</p></button>
-                    <button onclick="changeDay(6)" id="tab-day-6" class="day-tab shrink-0 px-4 py-2 rounded-xl text-center shadow-wanted transform transition rotate-1 border-2"><p class="text-sm font-black">DAY 6</p></button>
-                    <button onclick="changeDay(7)" id="tab-day-7" class="day-tab shrink-0 px-4 py-2 rounded-xl text-center shadow-wanted transform transition -rotate-1 border-2"><p class="text-sm font-black">DAY 7</p></button>
+
+                <!-- Day Tabs 優化 -->
+                <div class="flex overflow-x-auto gap-3 pb-4 custom-scrollbar px-1" id="day-tabs">
+                    <button onclick="changeDay(1)" id="tab-day-1"
+                        class="day-tab shrink-0 flex items-center justify-center px-4 py-2.5 rounded-xl shadow-lg border border-white/20 hover:scale-105 active:scale-95 transition-all w-24 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
+                        <p class="text-sm font-bold tracking-wider">DAY 1</p>
+                    </button>
+                    <button onclick="changeDay(2)" id="tab-day-2"
+                        class="day-tab shrink-0 flex items-center justify-center px-4 py-2.5 rounded-xl shadow-lg border border-white/20 hover:scale-105 active:scale-95 transition-all w-24 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
+                        <p class="text-sm font-bold tracking-wider">DAY 2</p>
+                    </button>
+                    <button onclick="changeDay(3)" id="tab-day-3"
+                        class="day-tab shrink-0 flex items-center justify-center px-4 py-2.5 rounded-xl shadow-lg border border-white/20 hover:scale-105 active:scale-95 transition-all w-24 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
+                        <p class="text-sm font-bold tracking-wider">DAY 3</p>
+                    </button>
+                    <button onclick="changeDay(4)" id="tab-day-4"
+                        class="day-tab shrink-0 flex items-center justify-center px-4 py-2.5 rounded-xl shadow-lg border border-white/20 hover:scale-105 active:scale-95 transition-all w-24 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
+                        <p class="text-sm font-bold tracking-wider">DAY 4</p>
+                    </button>
+                    <button onclick="changeDay(5)" id="tab-day-5"
+                        class="day-tab shrink-0 flex items-center justify-center px-4 py-2.5 rounded-xl shadow-lg border border-white/20 hover:scale-105 active:scale-95 transition-all w-24 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
+                        <p class="text-sm font-bold tracking-wider">DAY 5</p>
+                    </button>
+                    <button onclick="changeDay(6)" id="tab-day-6"
+                        class="day-tab shrink-0 flex items-center justify-center px-4 py-2.5 rounded-xl shadow-lg border border-white/20 hover:scale-105 active:scale-95 transition-all w-24 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
+                        <p class="text-sm font-bold tracking-wider">DAY 6</p>
+                    </button>
+                    <button onclick="changeDay(7)" id="tab-day-7"
+                        class="day-tab shrink-0 flex items-center justify-center px-4 py-2.5 rounded-xl shadow-lg border border-white/20 hover:scale-105 active:scale-95 transition-all w-24 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
+                        <p class="text-sm font-bold tracking-wider">DAY 7</p>
+                    </button>
                 </div>
-                
+
                 <!-- Timeline List -->
                 <div class="relative pl-7 pt-2 space-y-7" id="itinerary-list">
-                    <p class="text-center font-bold text-wood-600 py-6">載入中...</p>
+                    <p class="text-center font-bold text-gray-400 py-6">載入中...</p>
                 </div>
-                
-                <button onclick="openItineraryAddModal()" class="w-full bg-white/50 border-2 border-dashed border-wood-600 text-wood-800 font-black py-3 rounded-xl hover:bg-white/80 transition mt-6 shadow-sm active:scale-95">
+
+                <button onclick="openItineraryAddModal()"
+                    class="w-full bg-dark-200/40 backdrop-blur-md border border-primary/20 border-dashed border-wood-600 text-gray-200 font-bold tracking-wider py-3 rounded-xl hover:bg-dark-200/40 backdrop-blur-md transition mt-6 shadow-sm active:scale-95">
                     <i class="ph-bold ph-plus mr-1"></i> 新增航點
                 </button>
             </div>
@@ -150,14 +304,18 @@
             <!-- VIEW: CHECKLIST (裝備庫) -->
             <div id="view-checklist" class="view-section hidden space-y-4">
                 <div class="flex justify-between items-end mb-5">
-                    <h2 class="text-2xl font-black text-wood-900 drop-shadow-sm">裝備庫</h2>
-                    <span class="text-xs font-black text-wood-900 bg-secondary border-2 border-wood-800 px-3 py-1.5 rounded-full shadow-wanted-sm">打點行囊</span>
+                    <h2 class="text-2xl font-bold tracking-wider text-gray-100 drop-shadow-sm">裝備庫</h2>
+                    <span onclick="resetChecklist()"
+                        class="text-xs font-bold tracking-wider text-gray-100 bg-secondary border border-primary/20 border-white/10 px-3 py-1.5 rounded-full shadow-wanted-sm cursor-pointer hover:bg-parchment-300 transition active:scale-95 flex items-center gap-1"><i class="ph-bold ph-arrow-counter-clockwise"></i> 重新打包</span>
                 </div>
-                
-                <div class="bg-white/80 border-2 border-wood-800 p-4 rounded-xl shadow-wanted mb-4">
+
+                <div class="bg-dark-200/40 backdrop-blur-md border border-primary/20 border-white/10 p-4 rounded-xl shadow-wanted mb-4">
                     <div class="flex gap-2">
-                        <input type="text" id="checklist-input" placeholder="新增裝備 (例：行動電源)" class="flex-1 border-b-2 border-wood-500 bg-transparent px-2 py-1 font-bold text-wood-900 focus:outline-none focus:border-primary">
-                        <button onclick="addChecklistItem()" class="bg-primary hover:bg-wood-900 text-white font-bold p-2 text-xl rounded transition shadow-sm active:scale-95"><i class="ph-bold ph-plus"></i></button>
+                        <input type="text" id="checklist-input" placeholder="新增裝備 (例：行動電源)"
+                            class="flex-1 border-b-2 border-white/5 bg-transparent px-2 py-1 font-bold text-gray-100 focus:outline-none focus:border-primary">
+                        <button onclick="addChecklistItem()"
+                            class="bg-primary hover:bg-black text-white font-bold p-2 text-xl rounded transition shadow-sm active:scale-95"><i
+                                class="ph-bold ph-plus"></i></button>
                     </div>
                 </div>
 
@@ -167,22 +325,32 @@
             <!-- VIEW: EXPENSES (金庫記帳) -->
             <div id="view-expenses" class="view-section hidden space-y-6">
                 <!-- BUDGET CARD -->
-                <div class="bg-[#e4cb98] border-8 border-wood-800 p-6 shadow-wanted relative overflow-hidden text-center">
-                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] opacity-50 mixing-blend-multiply"></div>
-                    <h2 class="text-3xl font-black text-wood-900 tracking-widest relative z-10 font-[serif] border-b-2 border-wood-800 pb-2 mb-3 inline-block">WANTED</h2>
-                    <p class="text-xs font-bold text-wood-700 tracking-widest relative z-10 mb-1 block">目前已花費資金 (JPY)</p>
-                    <div class="text-5xl font-black text-wood-900 my-4 tracking-tighter relative z-10 drop-shadow-[1px_1px_0_#fff]">
+                <div
+                    class="bg-gradient-to-br from-dark-100 to-dark-300 border-8 border-white/10 p-6 shadow-wanted relative overflow-hidden text-center">
+                    <div
+                        class="absolute inset-0 bg-none opacity-50 mixing-blend-multiply">
+                    </div>
+                    <h2
+                        class="text-3xl font-bold tracking-wider text-gray-100 tracking-widest relative z-10 font-[serif] border-b-2 border-white/10 pb-2 mb-3 inline-block">
+                        WANTED</h2>
+                    <p class="text-xs font-bold text-gray-300 tracking-widest relative z-10 mb-1 block">目前已花費資金 (JPY)
+                    </p>
+                    <div
+                        class="text-5xl font-bold tracking-wider text-gray-100 my-4 tracking-tighter relative z-10 drop-shadow-[1px_1px_0_#fff]">
                         <span class="text-2xl mr-1">฿</span><span id="expense-total">--</span>
                     </div>
-                    <div class="flex justify-between text-xs font-black tracking-widest text-wood-800 mt-4 relative z-10 bg-white/30 p-2 rounded border border-wood-800">
+                    <div
+                        class="flex justify-between text-xs font-bold tracking-wider tracking-widest text-gray-200 mt-4 relative z-10 bg-dark-200/40 backdrop-blur-md p-2 rounded border border-white/10">
                         <span>總金庫: ฿<span id="expense-budget">--</span></span>
                         <span class="text-primary">結餘: ฿<span id="expense-left">--</span></span>
                     </div>
                 </div>
 
                 <div class="flex justify-between items-center mt-6">
-                    <h3 class="text-lg font-black text-wood-900 border-l-4 border-primary pl-2">敗家紀錄</h3>
-                    <button onclick="openExpenseModal()" class="bg-secondary border-2 border-wood-800 text-wood-900 text-sm font-black px-3 py-1 flex items-center shadow-wanted-sm transform transition hover:-translate-y-1 active:scale-95"><i class="ph-bold ph-plus mr-1"></i>新添一筆</button>
+                    <h3 class="text-lg font-bold tracking-wider text-gray-100 border-l-2 border-primary pl-2">敗家紀錄</h3>
+                    <button onclick="openExpenseModal()"
+                        class="bg-secondary border border-primary/20 border-white/10 text-gray-100 text-sm font-bold tracking-wider px-3 py-1 flex items-center shadow-wanted-sm transform transition hover:-translate-y-1 active:scale-95"><i
+                            class="ph-bold ph-plus mr-1"></i>新添一筆</button>
                 </div>
 
                 <div id="expense-list" class="space-y-4"></div>
@@ -192,77 +360,112 @@
         <!-- MODAL: 新增/編輯金庫花費 -->
         <div id="expense-modal" class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center hidden">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeExpenseModal()"></div>
-            <div class="bg-parchment-100 w-full max-w-md p-6 rounded-t-3xl sm:rounded-3xl border-t-4 sm:border-4 border-wood-800 shadow-wanted relative z-10 transition-transform duration-300 transform translate-y-full" id="expense-modal-content">
-                <div class="flex justify-between items-end mb-4 border-b-2 border-wood-800 pb-2">
-                    <h3 class="text-2xl font-black text-wood-900" id="expense-modal-title">新紀錄</h3>
-                    <button id="btn-delete-expense" onclick="deleteExpense()" class="hidden text-primary font-black hover:scale-110 active:scale-95 transition flex items-center text-sm bg-red-100 px-3 py-1 rounded border border-red-300"><i class="ph-fill ph-skull mr-1"></i>放棄紀錄</button>
+            <div class="bg-dark-300 w-full max-w-md p-6 rounded-t-3xl sm:rounded-2xl border-t border-primary/40 sm:border border-primary/20 border-white/10 shadow-wanted relative z-10 transition-transform duration-300 transform translate-y-full"
+                id="expense-modal-content">
+                <div class="flex justify-between items-end mb-4 border-b-2 border-white/10 pb-2">
+                    <h3 class="text-2xl font-bold tracking-wider text-gray-100" id="expense-modal-title">新紀錄</h3>
+                    <button id="btn-delete-expense" onclick="deleteExpense()"
+                        class="hidden text-primary font-bold tracking-wider hover:scale-110 active:scale-95 transition flex items-center text-sm bg-red-100 px-3 py-1 rounded border border-red-300"><i
+                            class="ph-fill ph-skull mr-1"></i>放棄紀錄</button>
                 </div>
                 <div class="space-y-4">
                     <input type="hidden" id="expense-id">
-                    <div><label class="block text-sm font-bold text-wood-700 mb-1">項目</label><input type="text" id="expense-title" class="w-full bg-white border-2 border-wood-500 rounded p-2 font-bold" autocomplete="off"></div>
-                    <div><label class="block text-sm font-bold text-wood-700 mb-1">金額 (¥)</label><input type="number" id="expense-amount" class="w-full bg-white border-2 border-wood-500 rounded p-2 font-bold"></div>
-                    <button onclick="submitExpense()" class="w-full bg-primary border-4 border-wood-900 text-secondary font-black text-xl py-3 rounded-xl hover:bg-red-700 active:translate-y-1 active:shadow-none mt-4 transition">記錄進金庫！</button>
+                    <div><label class="block text-sm font-bold text-gray-300 mb-1">項目</label><input type="text"
+                            id="expense-title" class="w-full bg-dark-200/70 backdrop-blur-xl border border-primary/20 border-white/5 rounded p-2 font-bold"
+                            autocomplete="off"></div>
+                    <div><label class="block text-sm font-bold text-gray-300 mb-1">金額 (¥)</label><input type="number"
+                            id="expense-amount" class="w-full bg-dark-200/70 backdrop-blur-xl border border-primary/20 border-white/5 rounded p-2 font-bold">
+                    </div>
+                    <button onclick="submitExpense()"
+                        class="w-full bg-primary border border-primary/20 border-white/10 text-secondary font-bold tracking-wider text-xl py-3 rounded-xl hover:bg-red-700 active:translate-y-1 active:shadow-none mt-4 transition">記錄進金庫！</button>
                 </div>
-                <button onclick="closeExpenseModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-wood-200 border-2 border-wood-800 text-wood-900 rounded-full font-bold">X</button>
+                <button onclick="closeExpenseModal()"
+                    class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-wood-200 border border-primary/20 border-white/10 text-gray-100 rounded-full font-bold">X</button>
             </div>
         </div>
 
         <!-- MODAL: 娜美氣象局詳細 -->
         <div id="weather-modal" class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center hidden">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeWeatherModal()"></div>
-            <div class="bg-ocean w-full max-w-md p-6 rounded-t-3xl sm:rounded-3xl border-t-4 sm:border-4 border-wood-800 shadow-wanted relative z-10 transition-transform duration-300 transform translate-y-full" id="weather-modal-content">
-                <h3 class="text-2xl font-black text-white mb-4 border-b-2 border-white/30 pb-2 flex items-center"><i class="ph-fill ph-cloud-sun mr-2"></i>娜美氣象局 - 福岡縣</h3>
-                <div class="bg-white/10 p-4 rounded-xl border-2 border-white/20 text-white space-y-3">
+            <div class="bg-ocean w-full max-w-md p-6 rounded-t-3xl sm:rounded-2xl border-t border-primary/40 sm:border border-primary/20 border-white/10 shadow-wanted relative z-10 transition-transform duration-300 transform translate-y-full"
+                id="weather-modal-content">
+                <h3 class="text-2xl font-bold tracking-wider text-white mb-4 border-b-2 border-white/30 pb-2 flex items-center"><i
+                        class="ph-fill ph-cloud-sun mr-2"></i>娜美氣象局 - 福岡縣</h3>
+                <div class="bg-dark-200/40 backdrop-blur-md p-4 rounded-xl border border-primary/20 border-white/20 text-white space-y-3">
                     <p class="text-sm font-bold opacity-80 mb-1">即時氣候資訊</p>
-                    <div class="flex justify-between items-center text-xl font-black border-b border-white/20 pb-2"><span id="weather-desc">讀取中...</span> <span class="text-4xl" id="weather-temp">--°C</span></div>
-                    <div class="flex justify-between items-center text-sm font-bold"><span class="opacity-80">降雨狀態</span> <span id="weather-precip">--</span></div>
+                    <div class="flex justify-between items-center text-xl font-bold tracking-wider border-b border-white/20 pb-2">
+                        <span id="weather-desc">讀取中...</span> <span class="text-4xl" id="weather-temp">--°C</span></div>
+                    <div class="flex justify-between items-center text-sm font-bold"><span
+                            class="opacity-80">降雨狀態</span> <span id="weather-precip">--</span></div>
                 </div>
-                <button onclick="closeWeatherModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-white/20 text-white rounded-full font-bold hover:bg-white/40">X</button>
+                <button onclick="closeWeatherModal()"
+                    class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-dark-200/40 backdrop-blur-md text-white rounded-full font-bold hover:bg-dark-200/40 backdrop-blur-md">X</button>
             </div>
         </div>
 
         <!-- MODAL: 新增航程景點 -->
         <div id="itinerary-add-modal" class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center hidden">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeItineraryAddModal()"></div>
-            <div class="bg-parchment-100 w-full max-w-md p-6 rounded-t-3xl sm:rounded-3xl border-t-4 sm:border-4 border-wood-800 shadow-wanted relative z-10 transition-transform duration-300 transform translate-y-full" id="itinerary-add-modal-content">
-                <h3 class="text-2xl font-black text-wood-900 mb-4 border-b-2 border-wood-800 pb-2" id="add-itin-modal-title">新增/編輯航點</h3>
+            <div class="bg-dark-300 w-full max-w-md p-6 rounded-t-3xl sm:rounded-2xl border-t border-primary/40 sm:border border-primary/20 border-white/10 shadow-wanted relative z-10 transition-transform duration-300 transform translate-y-full"
+                id="itinerary-add-modal-content">
+                <h3 class="text-2xl font-bold tracking-wider text-gray-100 mb-4 border-b-2 border-white/10 pb-2"
+                    id="add-itin-modal-title">新增/編輯航點</h3>
                 <input type="hidden" id="add-itin-id">
                 <div class="space-y-3">
                     <div class="flex gap-3">
-                        <div class="w-1/3"><label class="block text-sm font-bold text-wood-700 mb-1">時間</label><input type="time" id="add-itin-time" class="w-full bg-white border-2 border-wood-500 rounded p-2 font-bold" value="10:00"></div>
-                        <div class="w-2/3"><label class="block text-sm font-bold text-wood-700 mb-1">景點或活動名稱</label><input type="text" id="add-itin-title" class="w-full bg-white border-2 border-wood-500 rounded p-2 font-bold" placeholder="天神購物..."></div>
+                        <div class="w-1/3"><label class="block text-sm font-bold text-gray-300 mb-1">時間</label><input
+                                type="time" id="add-itin-time"
+                                class="w-full bg-dark-200/70 backdrop-blur-xl border border-primary/20 border-white/5 rounded p-2 font-bold" value="10:00">
+                        </div>
+                        <div class="w-2/3"><label
+                                class="block text-sm font-bold text-gray-300 mb-1">景點或活動名稱</label><input type="text"
+                                id="add-itin-title"
+                                class="w-full bg-dark-200/70 backdrop-blur-xl border border-primary/20 border-white/5 rounded p-2 font-bold"
+                                placeholder="天神購物..."></div>
                     </div>
-                    <div><label class="block text-sm font-bold text-wood-700 mb-1">敘述/備忘錄</label><input type="text" id="add-itin-desc" class="w-full bg-white border-2 border-wood-500 rounded p-2 font-bold" placeholder="搭乘地鐵..."></div>
-                    <div><label class="block text-sm font-bold text-wood-700 mb-1">照片網址 (選填)</label><input type="url" id="add-itin-img" class="w-full bg-white border-2 border-wood-500 rounded p-2 font-bold text-xs" placeholder="https://..."></div>
-                    <button onclick="submitItinerary()" class="w-full bg-secondary border-4 border-wood-900 text-wood-900 font-black text-xl py-3 rounded-xl active:translate-y-1 mt-4 transition">下錨確認！</button>
+                    <div><label class="block text-sm font-bold text-gray-300 mb-1">敘述/備忘錄</label><input type="text"
+                            id="add-itin-desc" class="w-full bg-dark-200/70 backdrop-blur-xl border border-primary/20 border-white/5 rounded p-2 font-bold"
+                            placeholder="搭乘地鐵..."></div>
+                    <div><label class="block text-sm font-bold text-gray-300 mb-1">照片網址 (選填)</label><input type="url"
+                            id="add-itin-img"
+                            class="w-full bg-dark-200/70 backdrop-blur-xl border border-primary/20 border-white/5 rounded p-2 font-bold text-xs"
+                            placeholder="https://..."></div>
+                    <button onclick="submitItinerary()"
+                        class="w-full bg-secondary border border-primary/20 border-white/10 text-gray-100 font-bold tracking-wider text-xl py-3 rounded-xl active:translate-y-1 mt-4 transition">下錨確認！</button>
                 </div>
-                <button onclick="closeItineraryAddModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-wood-200 border-2 border-wood-800 text-wood-900 rounded-full font-bold">X</button>
+                <button onclick="closeItineraryAddModal()"
+                    class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-wood-200 border border-primary/20 border-white/10 text-gray-100 rounded-full font-bold">X</button>
             </div>
         </div>
 
         <!-- MODAL: 景點詳情與圖片預覽 -->
         <div id="itinerary-detail-modal" class="fixed inset-0 z-[70] flex items-center justify-center hidden p-4">
             <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeItineraryDetail()"></div>
-            <div class="bg-white w-full max-w-sm mx-auto rounded-[2rem] border-4 border-wood-800 shadow-[8px_8px_0_rgba(69,26,3,1)] relative z-10 overflow-hidden scale-95 opacity-0 transition-all duration-300 flex flex-col" id="itinerary-detail-content">
-                <button onclick="closeItineraryDetail()" class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-black/50 text-white rounded-full font-bold z-20 backdrop-blur hover:bg-black/70 transition">X</button>
-                
+            <div class="bg-dark-200/70 backdrop-blur-xl w-full max-w-sm mx-auto rounded-2xl border border-primary/20 border-white/10 shadow-2xl relative z-10 overflow-hidden scale-95 opacity-0 transition-all duration-300 flex flex-col"
+                id="itinerary-detail-content">
+                <button onclick="closeItineraryDetail()"
+                    class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-black/50 text-white rounded-full font-bold z-20 backdrop-blur hover:bg-black/70 transition">X</button>
+
                 <div class="h-64 bg-gray-200 relative shrink-0">
                     <!-- 圖片會顯示在此 -->
                     <img id="detail-img" src="" alt="View" class="w-full h-full object-cover">
                     <!-- 漸層黑色遮罩讓字體清晰 -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-5">
-                        <span id="detail-time" class="text-secondary font-black text-sm drop-shadow-md mb-1"></span>
-                        <h2 id="detail-title" class="text-white text-3xl font-black drop-shadow-md leading-tight"></h2>
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-5">
+                        <span id="detail-time" class="text-secondary font-bold tracking-wider text-sm drop-shadow-md mb-1"></span>
+                        <h2 id="detail-title" class="text-white text-3xl font-bold tracking-wider drop-shadow-md leading-tight"></h2>
                     </div>
                 </div>
-                
-                <div class="p-6 bg-parchment-100 flex-1 flex flex-col">
-                    <p id="detail-desc" class="text-wood-800 font-bold mb-6 text-sm flex-1"></p>
+
+                <div class="p-6 bg-dark-300 flex-1 flex flex-col">
+                    <p id="detail-desc" class="text-gray-200 font-bold mb-6 text-sm flex-1"></p>
                     <div class="mt-auto pt-4 border-t-2 border-wood-300 flex justify-end gap-4">
-                        <button onclick="editCurrentItinerary()" class="flex items-center gap-1 text-ocean font-bold text-xs hover:text-blue-700 transition active:scale-95">
+                        <button onclick="editCurrentItinerary()"
+                            class="flex items-center gap-1 text-ocean font-bold text-xs hover:text-blue-700 transition active:scale-95">
                             <i class="ph-bold ph-pencil text-sm"></i> 編輯
                         </button>
-                        <button id="btn-delete-itin" class="flex items-center gap-1 text-red-500 font-bold text-xs hover:text-red-700 transition active:scale-95">
+                        <button id="btn-delete-itin"
+                            class="flex items-center gap-1 text-red-500 font-bold text-xs hover:text-red-700 transition active:scale-95">
                             <i class="ph-bold ph-trash text-sm"></i> 刪除此景點
                         </button>
                     </div>
@@ -273,13 +476,19 @@
         <!-- MODAL: 偉大航道地圖 (Google Map iframe) -->
         <div id="map-modal" class="fixed inset-0 z-[70] flex items-center justify-center hidden p-4">
             <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeMapModal()"></div>
-            <div class="bg-wood-800 w-full max-w-md h-[80vh] rounded-3xl border-4 border-secondary shadow-[8px_8px_0_rgba(234,179,8,1)] relative z-10 overflow-hidden scale-95 opacity-0 transition-all duration-300 flex flex-col" id="map-modal-content">
-                <div class="bg-wood-900 p-3 flex justify-between items-center text-secondary border-b-2 border-secondary">
-                    <h3 class="font-black tracking-widest flex items-center"><i class="ph-fill ph-map-trifold mr-2 text-xl"></i>偉大航道總覽</h3>
-                    <button onclick="closeMapModal()" class="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full font-bold hover:bg-white/30">X</button>
+            <div class="bg-dark-100/90 backdrop-blur-md w-full max-w-md h-[80vh] rounded-2xl border border-primary/20 border-secondary shadow-2xl relative z-10 overflow-hidden scale-95 opacity-0 transition-all duration-300 flex flex-col"
+                id="map-modal-content">
+                <div
+                    class="bg-black p-3 flex justify-between items-center text-secondary border-b-2 border-secondary">
+                    <h3 id="map-modal-title" class="font-bold tracking-wider tracking-widest flex items-center"><i
+                            class="ph-fill ph-map-trifold mr-2 text-xl"></i>偉大航道總覽</h3>
+                    <button onclick="closeMapModal()"
+                        class="w-8 h-8 flex items-center justify-center bg-dark-200/40 backdrop-blur-md rounded-full font-bold hover:bg-dark-200/40 backdrop-blur-md">X</button>
                 </div>
-                <div class="flex-1 bg-white relative">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1692226.790518779!2d129.54924296225762!3d32.74797087090886!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x35418df419cc5b1b%3A0xe5edde6ceac6bf63!2sKyushu!5e0!3m2!1sen!2stw!4v1711200000000!5m2!1sen!2stw" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                <div class="flex-1 bg-dark-200/70 backdrop-blur-xl relative">
+                    <iframe id="map-iframe"
+                        src="https://maps.google.com/maps?q=Kyushu&t=&z=10&ie=UTF8&iwloc=&output=embed" width="100%"
+                        height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                 </div>
             </div>
         </div>
@@ -287,48 +496,71 @@
         <!-- MODAL: Settings 船長設定 -->
         <div id="settings-modal" class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center hidden">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeSettingsModal()"></div>
-            <div class="bg-parchment-200 w-full max-w-md p-6 rounded-t-3xl sm:rounded-3xl border-t-4 sm:border-4 border-wood-800 shadow-wanted relative z-10 transition-transform duration-300 transform translate-y-full" id="settings-modal-content">
-                <h3 class="text-2xl font-black text-wood-900 mb-4 border-b-2 border-wood-800 pb-2 flex items-center"><i class="ph-fill ph-skull mr-2 text-primary"></i>船長室</h3>
+            <div class="bg-dark-200/80 backdrop-blur-xl w-full max-w-md p-6 rounded-t-3xl sm:rounded-2xl border-t border-primary/40 sm:border border-primary/20 border-white/10 shadow-wanted relative z-10 transition-transform duration-300 transform translate-y-full"
+                id="settings-modal-content">
+                <h3 class="text-2xl font-bold tracking-wider text-gray-100 mb-4 border-b-2 border-white/10 pb-2 flex items-center"><i
+                        class="ph-fill ph-skull mr-2 text-primary"></i>船長室</h3>
                 <div class="space-y-4">
                     <div>
                         <div class="flex justify-between items-end mb-1">
-                            <label class="block text-sm font-bold text-wood-700">金庫總預算 (日圓)</label>
-                            <span class="text-xs font-black text-primary bg-red-100 px-2 rounded" id="setting-budget-twd">約 NT$ --</span>
+                            <label class="block text-sm font-bold text-gray-300">金庫總預算 (日圓)</label>
+                            <span class="text-xs font-bold tracking-wider text-primary bg-red-100 px-2 rounded"
+                                id="setting-budget-twd">約 NT$ --</span>
                         </div>
-                        <input type="number" id="setting-budget" oninput="updateSettingBudgetTWD()" class="w-full bg-white border-2 border-wood-500 rounded p-2 font-bold focus:outline-none focus:border-primary">
+                        <input type="number" id="setting-budget" oninput="updateSettingBudgetTWD()"
+                            class="w-full bg-dark-200/70 backdrop-blur-xl border border-primary/20 border-white/5 rounded p-2 font-bold focus:outline-none focus:border-primary">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-wood-700 mb-1">出發航向日</label>
-                        <input type="date" id="setting-date" class="w-full bg-white border-2 border-wood-500 rounded p-2 font-bold focus:outline-none focus:border-primary">
+                        <label class="block text-sm font-bold text-gray-300 mb-1">出發航向日</label>
+                        <input type="date" id="setting-date"
+                            class="w-full bg-dark-200/70 backdrop-blur-xl border border-primary/20 border-white/5 rounded p-2 font-bold focus:outline-none focus:border-primary">
                     </div>
-                    <button onclick="saveSettings()" class="w-full bg-wood-800 text-white font-black text-lg py-3 rounded-xl hover:bg-wood-900 active:scale-95 mt-4 transition border-2 border-wood-900">
+                    <button onclick="saveSettings()"
+                        class="w-full bg-dark-100/90 backdrop-blur-md text-white font-bold tracking-wider text-lg py-3 rounded-xl hover:bg-black active:scale-95 mt-4 transition border border-primary/20 border-white/10">
                         更新航海計畫
                     </button>
                 </div>
-                <button onclick="closeSettingsModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-wood-500 text-white rounded-full font-bold hover:bg-wood-700">X</button>
+                <button onclick="closeSettingsModal()"
+                    class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-wood-500 text-white rounded-full font-bold hover:bg-wood-700">X</button>
             </div>
         </div>
 
         <!-- Bottom Navigation -->
-        <nav class="bg-wood-800 text-parchment-200 border-t-4 border-wood-900 pb-safe pt-2 px-6 absolute bottom-0 w-full z-20 shadow-nav">
-            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-30 pointer-events-none"></div>
+        <nav
+            class="bg-dark-100/90 backdrop-blur-md text-gray-400 border-t border-primary/40 border-white/10 pb-safe pt-2 px-6 absolute bottom-0 w-full z-20 shadow-nav">
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-dark-100/50 to-dark-300/50 opacity-30 pointer-events-none">
+            </div>
             <div class="flex justify-between items-center pb-2 relative z-10">
-                <button onclick="switchTab('home')" class="nav-btn flex flex-col items-center p-2 pt-3 w-16 text-primary active" data-target="view-home">
-                    <i class="ph-fill ph-anchor text-2xl mb-1 icon-active drop-shadow-md"></i><span class="text-[10px] font-black tracking-widest">甲板</span>
+                <button onclick="switchTab('home')"
+                    class="nav-btn flex flex-col items-center p-2 pt-3 w-16 text-primary active"
+                    data-target="view-home">
+                    <i class="ph-fill ph-anchor text-2xl mb-1 icon-active drop-shadow-md"></i><span
+                        class="text-[10px] font-bold tracking-wider tracking-widest">甲板</span>
                 </button>
-                <button onclick="switchTab('itinerary')" class="nav-btn flex flex-col items-center p-2 pt-3 w-16 text-parchment-200 opacity-60 hover:opacity-100 transition" data-target="view-itinerary">
-                    <i class="ph-fill ph-compass text-2xl mb-1 icon-active drop-shadow-md"></i><span class="text-[10px] font-black tracking-widest">日誌</span>
+                <button onclick="switchTab('itinerary')"
+                    class="nav-btn flex flex-col items-center p-2 pt-3 w-16 text-gray-400 opacity-60 hover:opacity-100 transition"
+                    data-target="view-itinerary">
+                    <i class="ph-fill ph-compass text-2xl mb-1 icon-active drop-shadow-md"></i><span
+                        class="text-[10px] font-bold tracking-wider tracking-widest">日誌</span>
                 </button>
-                <div class="relative -top-7 group cursor-pointer" onclick="openExpenseModal()">
-                    <button class="w-16 h-16 bg-secondary text-wood-900 rounded-full shadow-wanted flex items-center justify-center border-4 border-wood-900 transform transition-transform group-hover:rotate-45 active:rotate-90">
+                <div class="relative -top-7 group cursor-pointer" onclick="openItineraryAddModal()">
+                    <button
+                        class="w-16 h-16 bg-secondary text-gray-100 rounded-full shadow-wanted flex items-center justify-center border border-primary/20 border-white/10 transform transition-transform group-hover:rotate-45 active:rotate-90">
                         <i class="ph-fill ph-steering-wheel text-4xl"></i>
                     </button>
                 </div>
-                <button onclick="switchTab('expenses')" class="nav-btn flex flex-col items-center p-2 pt-3 w-16 text-parchment-200 opacity-60 hover:opacity-100 transition" data-target="view-expenses">
-                    <i class="ph-fill ph-coins text-2xl mb-1 icon-active drop-shadow-md"></i><span class="text-[10px] font-black tracking-widest">金庫</span>
+                <button onclick="switchTab('expenses')"
+                    class="nav-btn flex flex-col items-center p-2 pt-3 w-16 text-gray-400 opacity-60 hover:opacity-100 transition"
+                    data-target="view-expenses">
+                    <i class="ph-fill ph-coins text-2xl mb-1 icon-active drop-shadow-md"></i><span
+                        class="text-[10px] font-bold tracking-wider tracking-widest">金庫</span>
                 </button>
-                <button onclick="switchTab('checklist')" class="nav-btn flex flex-col items-center p-2 pt-3 w-16 text-parchment-200 opacity-60 hover:opacity-100 transition" data-target="view-checklist">
-                    <i class="ph-fill ph-gear text-2xl mb-1 icon-active drop-shadow-md"></i><span class="text-[10px] font-black tracking-widest">裝備</span>
+                <button onclick="switchTab('checklist')"
+                    class="nav-btn flex flex-col items-center p-2 pt-3 w-16 text-gray-400 opacity-60 hover:opacity-100 transition"
+                    data-target="view-checklist">
+                    <i class="ph-fill ph-gear text-2xl mb-1 icon-active drop-shadow-md"></i><span
+                        class="text-[10px] font-bold tracking-wider tracking-widest">裝備</span>
                 </button>
             </div>
         </nav>
@@ -337,4 +569,5 @@
     <!-- 腳本獨立載入 -->
     <script src="app.js"></script>
 </body>
+
 </html>

@@ -4,3 +4,5 @@ node_modules/
 .env
 .idea/
 .vscode/
+public/zoro-*.jpg
+public/zoro-*.mp4
