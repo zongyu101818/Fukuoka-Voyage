@@ -88,3 +88,15 @@ body::-webkit-scrollbar {
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: #7e22ce; border-radius: 10px; }
+
+/* 登入表單錯誤抖動動畫 */
+.wano-shake {
+    animation: wanoShake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes wanoShake {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(4px, 0, 0); filter: drop-shadow(0 0 15px rgba(255,0,0,0.8)); }
+    30%, 50%, 70% { transform: translate3d(-8px, 0, 0); filter: drop-shadow(0 0 25px rgba(255,0,0,1)); }
+    40%, 60% { transform: translate3d(8px, 0, 0); filter: drop-shadow(0 0 20px rgba(255,0,0,1)); }
+}

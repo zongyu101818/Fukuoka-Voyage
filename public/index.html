@@ -45,6 +45,84 @@
 
 <body class="bg-dark-400 text-gray-200 antialiased font-sans selection:bg-secondary selection:text-gray-100">
 
+    <!-- ========== 之國 · WANO 登入畫面 ========== -->
+    <div id="login-screen" class="fixed inset-0 z-[999] flex items-center justify-center overflow-hidden"
+        style="background: radial-gradient(ellipse at 50% 20%, #2d0808 0%, #0f0303 55%, #000000 100%);">
+
+        <!-- 左側裝飾垂直文字 -->
+        <div class="absolute left-3 top-0 bottom-0 flex items-center pointer-events-none select-none opacity-10"
+            style="writing-mode: vertical-rl;">
+            <span class="text-red-600 font-bold" style="font-size: 3.5rem; letter-spacing: 0.6em;">之國鬼兵衛門討伐</span>
+        </div>
+        <!-- 右側裝飾垂直文字 -->
+        <div class="absolute right-3 top-0 bottom-0 flex items-center pointer-events-none select-none opacity-10"
+            style="writing-mode: vertical-rl;">
+            <span class="text-red-600 font-bold" style="font-size: 3.5rem; letter-spacing: 0.6em;">WANO KUNI AUTHORIZED</span>
+        </div>
+
+        <!-- 頂部紅色光暈 -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-48 pointer-events-none"
+            style="background: radial-gradient(ellipse, rgba(180,20,20,0.18) 0%, transparent 70%);"></div>
+
+        <!-- 主要內容 -->
+        <div class="relative z-10 w-full max-w-[340px] mx-auto px-6 text-center">
+
+            <!-- 頂部徽章 -->
+            <div class="mb-6">
+                <p class="text-xs font-bold tracking-[0.6em] mb-3" style="color: rgba(180,50,0,0.8);">[ 之 國 · WANO KUNI ]</p>
+                <div class="flex items-center justify-center gap-3 mb-3">
+                    <div class="h-px flex-1" style="background: linear-gradient(to right, transparent, rgba(180,50,0,0.6));"></div>
+                    <span style="color: #b91c1c; font-size: 1.4rem;">⚔</span>
+                    <div class="h-px flex-1" style="background: linear-gradient(to left, transparent, rgba(180,50,0,0.6));"></div>
+                </div>
+                <h1 class="font-bold" style="font-size: 2.2rem; color: #fbbf24; text-shadow: 0 0 40px rgba(255,140,0,0.6), 0 2px 8px rgba(0,0,0,0.9); letter-spacing: 0.2em;">航海許可証</h1>
+                <p class="text-[10px] font-bold tracking-[0.4em] mt-1" style="color: rgba(180,90,0,0.55);">VOYAGE PERMIT REQUIRED</p>
+            </div>
+
+            <!-- 索隆頭像 -->
+            <div class="flex justify-center mb-7">
+                <div class="relative">
+                    <div class="w-20 h-20 rounded-full overflow-hidden"
+                        style="border: 2px solid #991b1b; box-shadow: 0 0 25px rgba(180,20,20,0.8), 0 0 60px rgba(180,20,20,0.3);">
+                        <img src="zoro-avatar.jpg" alt="Zoro" class="w-full h-full object-cover">
+                    </div>
+                    <div class="absolute inset-0 rounded-full scale-[1.15] pointer-events-none"
+                        style="border: 1px solid rgba(212,107,8,0.3);"></div>
+                </div>
+            </div>
+
+            <!-- 登入表單 -->
+            <div id="login-form" class="space-y-3">
+                <input type="text" id="login-username"
+                    placeholder="船員識別碼"
+                    autocomplete="off"
+                    class="w-full text-center font-bold tracking-widest py-3 px-4 rounded-lg focus:outline-none text-sm transition-all"
+                    style="background: rgba(50,8,8,0.85); border: 1px solid rgba(150,40,0,0.45); color: #fbbf24; backdrop-filter: blur(8px);"
+                    onfocus="this.style.borderColor='rgba(212,107,8,0.9)'; this.style.boxShadow='0 0 18px rgba(212,107,8,0.25)'"
+                    onblur="this.style.borderColor='rgba(150,40,0,0.45)'; this.style.boxShadow='none'"
+                    onkeydown="if(event.key==='Enter') document.getElementById('login-password').focus()">
+
+                <input type="password" id="login-password"
+                    placeholder="通行印鑑"
+                    class="w-full text-center font-bold tracking-widest py-3 px-4 rounded-lg focus:outline-none text-sm transition-all"
+                    style="background: rgba(50,8,8,0.85); border: 1px solid rgba(150,40,0,0.45); color: #fbbf24; backdrop-filter: blur(8px);"
+                    onfocus="this.style.borderColor='rgba(212,107,8,0.9)'; this.style.boxShadow='0 0 18px rgba(212,107,8,0.25)'"
+                    onblur="this.style.borderColor='rgba(150,40,0,0.45)'; this.style.boxShadow='none'"
+                    onkeydown="if(event.key==='Enter') attemptLogin()">
+
+                <p id="login-error" class="hidden text-xs font-bold tracking-wider" style="color: #ef4444;">⚔ 識別碼或印鑑錯誤，禁止入境！</p>
+
+                <button id="login-btn" onclick="attemptLogin()"
+                    class="w-full font-bold tracking-[0.5em] text-sm py-4 rounded-lg transition-all active:scale-95 mt-1"
+                    style="background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 45%, #b91c1c 55%, #7f1d1d 100%); color: #fbbf24; border: 1px solid rgba(180,50,0,0.5); box-shadow: 0 0 20px rgba(180,20,20,0.5), inset 0 1px 0 rgba(255,255,255,0.08);">
+                    入境許可
+                </button>
+            </div>
+
+            <p class="mt-7 font-bold tracking-[0.25em]" style="font-size: 9px; color: rgba(120,30,0,0.35);">FUKUOKA VOYAGE · 之國鬼兵 AUTHORIZED ONLY</p>
+        </div>
+    </div>
+
     <div id="app-container"
         class="relative max-w-md mx-auto h-[100dvh] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] bg-dark-400 bg-dark-300 overflow-hidden flex flex-col shadow-2xl sm:border border-primary/20 sm:border-white/10 sm:rounded-2xl sm:h-[90vh] sm:my-[5vh]">
         <div class="lightning-flash"></div>
@@ -528,7 +606,7 @@
             </div>
         </div>
 
-        <!-- MODAL: 密碼解析 - OCR 日文掃描翻譯 (Gemini AI) -->
+        <!-- MODAL: 密碼解析所 - 日文掃描翻譯 -->
         <div id="ocr-modal" class="fixed inset-0 z-[80] flex items-end sm:items-center justify-center hidden">
             <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="closeOcrModal()"></div>
             <div class="bg-dark-300 w-full max-w-md rounded-t-3xl sm:rounded-2xl border-t border-primary/60 sm:border border-primary/30 shadow-[0_0_60px_rgba(126,34,206,0.5)] relative z-10 transition-transform duration-300 transform translate-y-full overflow-hidden"
@@ -538,35 +616,12 @@
                 <div class="bg-gradient-to-r from-primary/80 to-dark-200/80 px-6 py-4 flex justify-between items-center border-b border-white/10">
                     <h3 class="text-xl font-bold tracking-wider text-secondary flex items-center gap-2">
                         <i class="ph-fill ph-scan text-2xl"></i> 密碼解析所
-                        <span class="text-[10px] bg-secondary/20 text-secondary border border-secondary/40 px-2 py-0.5 rounded-full ml-1">Gemini AI</span>
+                        <span class="text-[10px] bg-primary/20 text-primary/80 border border-primary/30 px-2 py-0.5 rounded-full ml-1">AI 翻譯</span>
                     </h3>
                     <button onclick="closeOcrModal()" class="w-8 h-8 flex items-center justify-center bg-black/40 text-white rounded-full font-bold hover:bg-black/70 transition">✕</button>
                 </div>
 
                 <div class="p-5 space-y-4 max-h-[80vh] overflow-y-auto custom-scrollbar">
-
-                    <!-- Gemini API Key 設定區 -->
-                    <div id="gemini-key-section" class="bg-dark-400/80 border border-secondary/30 rounded-xl p-3">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-bold text-secondary flex items-center gap-1.5">
-                                <i class="ph-fill ph-sparkle"></i> Gemini AI 解析引擎
-                            </span>
-                            <a href="https://aistudio.google.com/app/apikey" target="_blank"
-                                class="text-[10px] text-primary underline flex items-center gap-1">
-                                <i class="ph-bold ph-arrow-square-out text-xs"></i>免費取得 Key
-                            </a>
-                        </div>
-                        <div class="flex gap-2">
-                            <input type="password" id="gemini-key-input"
-                                placeholder="貼上 Gemini API Key (AIza...)"
-                                class="flex-1 bg-dark-200/70 border border-white/10 rounded-lg px-2 py-1.5 text-xs font-bold text-gray-100 focus:outline-none focus:border-secondary placeholder-gray-600">
-                            <button onclick="applyGeminiKey()"
-                                class="bg-secondary text-dark-400 font-bold text-xs px-3 rounded-lg hover:bg-yellow-400 active:scale-95 transition whitespace-nowrap">
-                                套用
-                            </button>
-                        </div>
-                        <p id="gemini-key-status" class="text-[10px] mt-1.5 font-bold"></p>
-                    </div>
 
                     <!-- 上傳區域 -->
                     <div id="ocr-drop-zone"

@@ -7,14 +7,42 @@ const fs = require('fs');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// DB 路徑：Render production 使用 persistent disk，本地使用 ./
+const DB_DIR = process.env.NODE_ENV === 'production' ? '/opt/render/project/data' : '.';
+if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
+const DB_PATH = path.join(DB_DIR, 'voyage.sqlite');
+
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 
 // 將靜態網頁交給 public 資料夾處理
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ==========================================
+// API: 翻譯代理 (Google Translate，不需用戶 API Key)
+// ==========================================
+app.post('/api/translate', async (req, res) => {
+    const { text, from = 'ja', to = 'zh-TW' } = req.body;
+    if (!text) return res.status(400).json({ error: '文字為必填' });
+    try {
+        const q = encodeURIComponent(text.substring(0, 2000));
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${q}`;
+        const response = await fetch(url, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; translateproxy/1.0)' }
+        });
+        if (!response.ok) throw new Error(`Google Translate HTTP ${response.status}`);
+        const data = await response.json();
+        // Google 回傳格式：[["翻譯文字", "原文"], ...]
+        const translated = data[0].map(item => item[0]).filter(Boolean).join('');
+        res.json({ translated });
+    } catch (err) {
+        console.error('Translation proxy error:', err.message);
+        res.status(500).json({ error: '翻譯服務暫時無法使用，請稍後再試' });
+    }
+});
+
 // 建立或連線 SQLite 資料庫
-const db = new sqlite3.Database('./voyage.sqlite', (err) => {
+const db = new sqlite3.Database(DB_PATH, (err) => {
     if (err) {
         console.error('金庫開啟失敗: ', err.message);
     } else {
