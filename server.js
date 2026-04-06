@@ -19,25 +19,47 @@ app.use(express.json({ limit: '5mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ==========================================
-// API: 翻譯代理 (Google Translate，不需用戶 API Key)
+// API: 圖片高精度解析翻譯 (利用後端 Gemini API，用戶前端不用輸入 Key)
 // ==========================================
-app.post('/api/translate', async (req, res) => {
-    const { text, from = 'ja', to = 'zh-TW' } = req.body;
-    if (!text) return res.status(400).json({ error: '文字為必填' });
+app.post('/api/scan-translate', async (req, res) => {
+    const { imageBase64, mimeType } = req.body;
+    if (!imageBase64) return res.status(400).json({ error: '找不到圖片內容' });
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+        return res.status(500).json({ error: '伺服器未設定 GEMINI_API_KEY 變數' });
+    }
+
     try {
-        const q = encodeURIComponent(text.substring(0, 2000));
-        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${q}`;
-        const response = await fetch(url, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; translateproxy/1.0)' }
-        });
-        if (!response.ok) throw new Error(`Google Translate HTTP ${response.status}`);
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [
+                            { text: '請辨識這張圖片中的所有日文文字，並翻譯成繁體中文。\n\n請嚴格只回應以下 JSON 格式，不要加入任何說明：\n{"japanese":"原文","chinese":"繁體中文翻譯"}' },
+                            { inline_data: { mime_type: mimeType || 'image/jpeg', data: imageBase64 } }
+                        ]
+                    }],
+                    generationConfig: { temperature: 0.1, maxOutputTokens: 2048 }
+                })
+            }
+        );
+
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData?.error?.message || `HTTP ${response.status}`);
+        }
+
         const data = await response.json();
-        // Google 回傳格式：[["翻譯文字", "原文"], ...]
-        const translated = data[0].map(item => item[0]).filter(Boolean).join('');
-        res.json({ translated });
+        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        res.json({ resultText: rawText });
+
     } catch (err) {
-        console.error('Translation proxy error:', err.message);
-        res.status(500).json({ error: '翻譯服務暫時無法使用，請稍後再試' });
+        console.error('Scan Translate error:', err.message);
+        res.status(500).json({ error: 'AI 解析失敗，請重試' });
     }
 });
 

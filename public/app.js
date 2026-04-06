@@ -603,72 +603,80 @@ function handleOcrFile(event) {
     reader.readAsDataURL(file);
 }
 
+// 圖片轉 base64（去掉 data:... 前綴）
+async function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
 async function runOcr() {
     if (!ocrImageFile) return;
 
     document.getElementById('ocr-scan-btn').classList.add('hidden');
     document.getElementById('ocr-result-box').classList.add('hidden');
     document.getElementById('ocr-progress-box').classList.remove('hidden');
-    document.getElementById('ocr-progress-bar').style.width = '0%';
-    document.getElementById('ocr-status-text').textContent = '⚙️ 初始化辨識引擎...';
+    document.getElementById('ocr-progress-bar').style.width = '20%';
+    document.getElementById('ocr-status-text').textContent = '🤖 圖片預處理中...';
 
     try {
-        const result = await Tesseract.recognize(
-            ocrImageFile,
-            'jpn',
-            {
-                logger: (m) => {
-                    if (m.status === 'recognizing text') {
-                        const pct = Math.round(m.progress * 100);
-                        document.getElementById('ocr-progress-bar').style.width = pct + '%';
-                        document.getElementById('ocr-status-text').textContent = `🔍 掃描日文中... ${pct}%`;
-                    } else if (m.status === 'loading tesseract core') {
-                        document.getElementById('ocr-status-text').textContent = '📦 載入辨識核心...';
-                    } else if (m.status === 'loading language traineddata') {
-                        document.getElementById('ocr-status-text').textContent = '📖 載入日文模型...';
-                    }
-                }
-            }
-        );
+        const base64 = await fileToBase64(ocrImageFile);
+        document.getElementById('ocr-progress-bar').style.width = '50%';
+        document.getElementById('ocr-status-text').textContent = '✨ AI 精準解析 ＆ 翻譯中，請稍候...';
 
-        const japaneseText = result.data.text.trim();
+        const res = await fetch('/api/scan-translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                imageBase64: base64,
+                mimeType: ocrImageFile.type || 'image/jpeg'
+            })
+        });
 
-        if (!japaneseText) {
-            document.getElementById('ocr-status-text').textContent = '⚠️ 未辨識到文字，請換清晰的圖片';
-            document.getElementById('ocr-scan-btn').classList.remove('hidden');
-            document.getElementById('ocr-progress-box').classList.add('hidden');
-            return;
+        document.getElementById('ocr-progress-bar').style.width = '90%';
+
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData?.error || `連線錯誤 (${res.status})`);
         }
 
-        document.getElementById('ocr-japanese-text').textContent = japaneseText;
-        document.getElementById('ocr-progress-bar').style.width = '80%';
-        document.getElementById('ocr-status-text').textContent = '🌏 翻譯成繁體中文中...';
-        document.getElementById('ocr-result-box').classList.remove('hidden');
-        document.getElementById('ocr-translated-text').textContent = '翻譯中...';
+        const data = await res.json();
+        const rawText = data.resultText || '';
 
-        // 呼叫後端翻譯 API（不需要任何 Key）
+        // Gemini JSON 擷取
+        let japanese = '', chinese = '';
         try {
-            const res = await fetch('/api/translate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: japaneseText, from: 'ja', to: 'zh-TW' })
-            });
-            const data = await res.json();
-            document.getElementById('ocr-translated-text').textContent = data.translated || '（翻譯失敗，請重試）';
-        } catch (transErr) {
-            document.getElementById('ocr-translated-text').textContent = '（翻譯服務暫時無法使用）';
+            const jsonMatch = rawText.match(/\{[\s\S]*?\}/);
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                japanese = (parsed.japanese || '').trim();
+                chinese = (parsed.chinese || '').trim();
+            } else {
+                japanese = rawText.trim();
+                chinese = '（AI 未回傳標準格式，顯示原始摘要）';
+            }
+        } catch (e) {
+            japanese = rawText.trim();
+            chinese = '（資料格式異常）';
         }
 
         document.getElementById('ocr-progress-bar').style.width = '100%';
+        document.getElementById('ocr-japanese-text').textContent = japanese || '（未偵測到文字）';
+        document.getElementById('ocr-translated-text').textContent = chinese || '（無翻譯）';
+        document.getElementById('ocr-result-box').classList.remove('hidden');
 
     } catch (err) {
         console.error('OCR error:', err);
-        document.getElementById('ocr-status-text').textContent = '❌ 解析失敗，請重試';
+        document.getElementById('ocr-status-text').textContent = `❌ ${err.message}`;
         document.getElementById('ocr-scan-btn').classList.remove('hidden');
     } finally {
         document.getElementById('ocr-progress-box').classList.add('hidden');
     }
 }
+
 
 function resetOcrModal() {
     ocrImageFile = null;
