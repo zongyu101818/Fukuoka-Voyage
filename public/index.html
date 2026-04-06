@@ -24,6 +24,9 @@
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
+    <!-- Tesseract.js OCR -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -186,7 +189,7 @@
                             class="text-[10px] font-bold text-gray-200 break-keep text-center w-full">船長室</span>
                     </button>
                 </div>
-                
+
                 <!-- 補充空間的船長備忘錄 - 滾動式卡片 -->
                 <div class="flex items-center justify-between mt-7 mb-3 border-l-2 border-ocean pl-2">
                     <h3 class="text-lg font-bold tracking-wider text-gray-100">船長室佈告欄</h3>
@@ -525,6 +528,76 @@
             </div>
         </div>
 
+        <!-- MODAL: 密碼解析 - OCR 日文掃描翻譯 -->
+        <div id="ocr-modal" class="fixed inset-0 z-[80] flex items-end sm:items-center justify-center hidden">
+            <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="closeOcrModal()"></div>
+            <div class="bg-dark-300 w-full max-w-md rounded-t-3xl sm:rounded-2xl border-t border-primary/60 sm:border border-primary/30 shadow-[0_0_60px_rgba(126,34,206,0.5)] relative z-10 transition-transform duration-300 transform translate-y-full overflow-hidden"
+                id="ocr-modal-content">
+
+                <!-- 標題列 -->
+                <div class="bg-gradient-to-r from-primary/80 to-dark-200/80 px-6 py-4 flex justify-between items-center border-b border-white/10">
+                    <h3 class="text-xl font-bold tracking-wider text-secondary flex items-center gap-2">
+                        <i class="ph-fill ph-scan text-2xl"></i> 密碼解析所
+                    </h3>
+                    <button onclick="closeOcrModal()" class="w-8 h-8 flex items-center justify-center bg-black/40 text-white rounded-full font-bold hover:bg-black/70 transition">✕</button>
+                </div>
+
+                <div class="p-5 space-y-4 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                    <!-- 上傳區域 -->
+                    <div id="ocr-drop-zone"
+                        onclick="document.getElementById('ocr-file-input').click()"
+                        class="border-2 border-dashed border-primary/50 rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-secondary hover:bg-dark-200/50 transition-all group min-h-[140px]">
+                        <i class="ph-fill ph-camera-plus text-5xl text-primary/60 group-hover:text-secondary group-hover:scale-110 transition-all"></i>
+                        <p class="text-sm font-bold text-gray-300 text-center">點擊上傳日文圖片<br><span class="text-gray-500 text-xs font-normal">支援照片、選單、看板等任何日文圖片</span></p>
+                        <input type="file" id="ocr-file-input" accept="image/*" capture="environment" class="hidden" onchange="handleOcrFile(event)">
+                    </div>
+
+                    <!-- 預覽圖（上傳後顯示）-->
+                    <div id="ocr-preview-box" class="hidden relative rounded-xl overflow-hidden border border-white/10">
+                        <img id="ocr-preview-img" src="" alt="預覽" class="w-full max-h-48 object-contain bg-dark-400">
+                        <button onclick="resetOcrModal()" class="absolute top-2 right-2 w-7 h-7 bg-black/60 text-white rounded-full text-sm flex items-center justify-center hover:bg-red-700 transition">✕</button>
+                    </div>
+
+                    <!-- 掃描按鈕 -->
+                    <button id="ocr-scan-btn" onclick="runOcr()" class="hidden w-full bg-primary hover:bg-purple-700 active:scale-95 text-secondary font-bold tracking-wider text-lg py-3 rounded-xl transition shadow-wanted flex items-center justify-center gap-2">
+                        <i class="ph-fill ph-magnifying-glass text-xl"></i> 開始解析日文！
+                    </button>
+
+                    <!-- 進度條 -->
+                    <div id="ocr-progress-box" class="hidden">
+                        <p id="ocr-status-text" class="text-xs text-gray-400 font-bold mb-2 text-center tracking-wider">正在解析中，請稍候...</p>
+                        <div class="w-full bg-dark-200 rounded-full h-2 overflow-hidden">
+                            <div id="ocr-progress-bar" class="h-2 bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-300" style="width:0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- 辨識結果 -->
+                    <div id="ocr-result-box" class="hidden space-y-3">
+                        <!-- 日文原文 -->
+                        <div class="bg-dark-200/60 border border-white/10 rounded-xl p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-gray-400 tracking-wider uppercase">🇯🇵 日文原文</span>
+                                <button onclick="copyText('ocr-japanese-text')" class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded hover:bg-primary/20 transition active:scale-95">複製</button>
+                            </div>
+                            <p id="ocr-japanese-text" class="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap font-sans"></p>
+                        </div>
+                        <!-- 翻譯結果 -->
+                        <div id="ocr-translation-box" class="bg-gradient-to-br from-primary/20 to-dark-300 border border-primary/40 rounded-xl p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-secondary tracking-wider uppercase">🇹🇼 繁體中文翻譯</span>
+                                <button onclick="copyText('ocr-translated-text')" class="text-[10px] font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded hover:bg-secondary/20 transition active:scale-95">複製</button>
+                            </div>
+                            <p id="ocr-translated-text" class="text-sm text-gray-100 leading-relaxed whitespace-pre-wrap font-bold">翻譯中...</p>
+                        </div>
+                        <!-- 重新掃描按鈕 -->
+                        <button onclick="resetOcrModal()" class="w-full bg-dark-200/50 border border-white/10 text-gray-300 font-bold py-2 rounded-xl hover:bg-dark-200 transition active:scale-95 text-sm">
+                            <i class="ph-bold ph-arrow-counter-clockwise mr-1"></i>重新掃描
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Bottom Navigation -->
         <nav
             class="bg-dark-100/90 backdrop-blur-md text-gray-400 border-t border-primary/40 border-white/10 pb-safe pt-2 px-6 absolute bottom-0 w-full z-20 shadow-nav">
@@ -544,10 +617,10 @@
                     <i class="ph-fill ph-compass text-2xl mb-1 icon-active drop-shadow-md"></i><span
                         class="text-[10px] font-bold tracking-wider tracking-widest">日誌</span>
                 </button>
-                <div class="relative -top-7 group cursor-pointer" onclick="openItineraryAddModal()">
+                <div class="relative -top-7 group cursor-pointer" onclick="openOcrModal()">
                     <button
-                        class="w-16 h-16 bg-secondary text-gray-100 rounded-full shadow-wanted flex items-center justify-center border border-primary/20 border-white/10 transform transition-transform group-hover:rotate-45 active:rotate-90">
-                        <i class="ph-fill ph-steering-wheel text-4xl"></i>
+                        class="w-16 h-16 bg-secondary text-gray-100 rounded-full shadow-wanted flex items-center justify-center border border-primary/20 border-white/10 transform transition-transform group-hover:scale-110 active:scale-95">
+                        <i class="ph-fill ph-scan text-4xl"></i>
                     </button>
                 </div>
                 <button onclick="switchTab('expenses')"

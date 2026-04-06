@@ -530,3 +530,200 @@ async function resetChecklist() {
     await fetch('/api/checklist/reset', { method: 'POST' });
     fetchChecklist();
 }
+
+// ===================================
+// 密碼解析所 (OCR 日文掃描翻譯)
+// ===================================
+let ocrImageFile = null;
+
+function openOcrModal() {
+    const m = document.getElementById('ocr-modal');
+    const c = document.getElementById('ocr-modal-content');
+    m.classList.remove('hidden');
+    setTimeout(() => c.classList.remove('translate-y-full'), 10);
+}
+
+function closeOcrModal() {
+    const c = document.getElementById('ocr-modal-content');
+    c.classList.add('translate-y-full');
+    setTimeout(() => document.getElementById('ocr-modal').classList.add('hidden'), 300);
+}
+
+function handleOcrFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    ocrImageFile = file;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        document.getElementById('ocr-preview-img').src = e.target.result;
+        document.getElementById('ocr-preview-box').classList.remove('hidden');
+        document.getElementById('ocr-drop-zone').classList.add('hidden');
+        document.getElementById('ocr-scan-btn').classList.remove('hidden');
+        document.getElementById('ocr-result-box').classList.add('hidden');
+        document.getElementById('ocr-progress-box').classList.add('hidden');
+    };
+    reader.readAsDataURL(file);
+}
+
+// 圖片預處理: 灰階 + 對比提升 → 讓 Tesseract 更容易識別日文
+async function preprocessImageForOcr(file) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+            // 建立 Canvas，最大寬度 2000px（太小會影響辨識率）
+            const MAX = 2000;
+            let w = img.width, h = img.height;
+            if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            
+            // 1. 畫原圖
+            ctx.drawImage(img, 0, 0, w, h);
+            
+            // 2. 灰階化 + 對比度增強
+            const imageData = ctx.getImageData(0, 0, w, h);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                // 灰階
+                const gray = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
+                // 對比增強 (factor=1.5)
+                const factor = 1.5;
+                const enhanced = Math.min(255, Math.max(0, factor * (gray - 128) + 128));
+                data[i] = data[i+1] = data[i+2] = enhanced;
+            }
+            ctx.putImageData(imageData, 0, 0);
+            
+            canvas.toBlob((blob) => {
+                URL.revokeObjectURL(url);
+                resolve(blob);
+            }, 'image/png');
+        };
+        img.src = url;
+    });
+}
+
+async function runOcr() {
+    if (!ocrImageFile) return;
+
+    document.getElementById('ocr-scan-btn').classList.add('hidden');
+    document.getElementById('ocr-result-box').classList.add('hidden');
+    document.getElementById('ocr-progress-box').classList.remove('hidden');
+    document.getElementById('ocr-progress-bar').style.width = '0%';
+    document.getElementById('ocr-status-text').textContent = '🖼️ 預處理圖片中...';
+
+    try {
+        // 預處理圖片
+        const processedBlob = await preprocessImageForOcr(ocrImageFile);
+        document.getElementById('ocr-status-text').textContent = '⚙️ 初始化解析引擎...';
+
+        const result = await Tesseract.recognize(
+            processedBlob,
+            'jpn+jpn_vert',   // 同時支援橫排和直排日文
+            {
+                logger: (m) => {
+                    if (m.status === 'recognizing text') {
+                        const pct = Math.round(m.progress * 100);
+                        document.getElementById('ocr-progress-bar').style.width = pct + '%';
+                        document.getElementById('ocr-status-text').textContent = `🔍 掃描日文中... ${pct}%`;
+                    } else if (m.status === 'loading tesseract core') {
+                        document.getElementById('ocr-status-text').textContent = '📦 載入識別核心...';
+                    } else if (m.status === 'loading language traineddata') {
+                        document.getElementById('ocr-status-text').textContent = '📖 載入日文語言模型...';
+                    }
+                },
+                tessedit_pageseg_mode: Tesseract.PSM.AUTO,  // 自動版面分析
+                tessedit_ocr_engine_mode: Tesseract.OEM.LSTM_ONLY, // 使用神經網路引擎
+            }
+        );
+
+        const japaneseText = result.data.text.trim();
+
+        if (!japaneseText) {
+            document.getElementById('ocr-status-text').textContent = '⚠️ 未辨識到文字，請換清晰的圖片試試';
+            document.getElementById('ocr-scan-btn').classList.remove('hidden');
+            document.getElementById('ocr-progress-box').classList.add('hidden');
+            return;
+        }
+
+        document.getElementById('ocr-japanese-text').textContent = japaneseText;
+        document.getElementById('ocr-progress-bar').style.width = '100%';
+        document.getElementById('ocr-status-text').textContent = '✅ 日文辨識完成，翻譯中...';
+        document.getElementById('ocr-result-box').classList.remove('hidden');
+        document.getElementById('ocr-translated-text').textContent = '翻譯中，請稍候...';
+
+        await translateJaToZhTW(japaneseText);
+
+    } catch (err) {
+        console.error('OCR error:', err);
+        document.getElementById('ocr-status-text').textContent = '❌ 解析失敗，請重試';
+        document.getElementById('ocr-scan-btn').classList.remove('hidden');
+    } finally {
+        document.getElementById('ocr-progress-box').classList.add('hidden');
+    }
+
+}
+
+async function translateJaToZhTW(text) {
+    const translatedEl = document.getElementById('ocr-translated-text');
+    const truncated = text.length > 500 ? text.substring(0, 500) + '...' : text;
+
+    try {
+        const encoded = encodeURIComponent(truncated);
+        const res = await fetch(`https://api.mymemory.translated.net/get?q=${encoded}&langpair=ja|zh-TW`);
+        const data = await res.json();
+
+        if (data.responseStatus === 200 && data.responseData && data.responseData.translatedText) {
+            let translated = data.responseData.translatedText;
+            if (translated.length < 2) translated = '（翻譯結果為空，請確認圖片包含日文文字）';
+            translatedEl.textContent = translated;
+        } else {
+            translatedEl.textContent = '（翻譯服務暫時無法使用，原文已顯示於上方）';
+        }
+    } catch (e) {
+        console.warn('Translation failed:', e);
+        translatedEl.textContent = '（網路無法連線，請確認網路後重試）';
+    }
+}
+
+function resetOcrModal() {
+    ocrImageFile = null;
+    const fileInput = document.getElementById('ocr-file-input');
+    if (fileInput) fileInput.value = '';
+    document.getElementById('ocr-preview-img').src = '';
+    document.getElementById('ocr-preview-box').classList.add('hidden');
+    document.getElementById('ocr-drop-zone').classList.remove('hidden');
+    document.getElementById('ocr-scan-btn').classList.add('hidden');
+    document.getElementById('ocr-result-box').classList.add('hidden');
+    document.getElementById('ocr-progress-box').classList.add('hidden');
+    document.getElementById('ocr-progress-bar').style.width = '0%';
+    document.getElementById('ocr-japanese-text').textContent = '';
+    document.getElementById('ocr-translated-text').textContent = '翻譯中...';
+}
+
+function copyText(elementId) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    const text = el.textContent;
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+        // 找到對應複製按鈕顯示回饋
+        const btn = el.closest('.bg-dark-200\\/60, .bg-gradient-to-br')?.querySelector('button[onclick]');
+        if (!btn) return;
+        const orig = btn.textContent;
+        btn.textContent = '✓ 已複製！';
+        btn.style.color = '#4ade80';
+        setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
+    }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+    });
+}
