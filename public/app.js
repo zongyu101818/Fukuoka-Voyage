@@ -603,11 +603,38 @@ function handleOcrFile(event) {
     reader.readAsDataURL(file);
 }
 
-// 圖片轉 base64（去掉 data:... 前綴）
+// 圖片壓縮並轉 base64（去掉 data:... 前綴），解決手機照片太大傳送失敗的問題
 async function fileToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let w = img.width;
+                let h = img.height;
+                // 最大寬高限制在 1200px 確保傳輸超快且不過大
+                const MAX_DIMENSION = 1200;
+                if (w > h && w > MAX_DIMENSION) {
+                    h = Math.round(h * (MAX_DIMENSION / w));
+                    w = MAX_DIMENSION;
+                } else if (h > MAX_DIMENSION) {
+                    w = Math.round(w * (MAX_DIMENSION / h));
+                    h = MAX_DIMENSION;
+                }
+                
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                
+                // 轉為 jpeg base64, 品質 0.8
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                resolve(dataUrl.split(',')[1]);
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+        };
         reader.onerror = reject;
         reader.readAsDataURL(file);
     });
