@@ -152,10 +152,9 @@ function closeSettingsModal() {
 }
 
 function gotoNotion() {
-    const url = document.getElementById('setting-notion-url').value;
+    let url = document.getElementById('setting-notion-url').value;
     if (!url) {
-        alert('請先貼上 Notion 網址並點擊更新！');
-        return;
+        url = 'https://www.notion.so/7-6-33acc8b2068d80d49de0ea80d4a12474?source=copy_link';
     }
     window.open(url, '_blank');
 }
