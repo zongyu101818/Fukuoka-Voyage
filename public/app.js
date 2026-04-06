@@ -108,9 +108,12 @@ async function fetchSettings() {
         const data = await res.json();
         if (data.total_budget) TOTAL_BUDGET = Number(data.total_budget);
         if (data.voyage_date) VOYAGE_DATE = data.voyage_date;
+        window.NOTION_URL = data.notion_url || '';
         
         document.getElementById('setting-budget').value = TOTAL_BUDGET;
         document.getElementById('setting-date').value = VOYAGE_DATE;
+        const notionEl = document.getElementById('setting-notion-url');
+        if (notionEl) notionEl.value = window.NOTION_URL;
         const bEl = document.getElementById('expense-budget');
         if (bEl) bEl.innerText = TOTAL_BUDGET.toLocaleString();
         
@@ -121,10 +124,13 @@ async function fetchSettings() {
 async function saveSettings() {
     const total_budget = document.getElementById('setting-budget').value;
     const voyage_date = document.getElementById('setting-date').value;
+    const notionEl = document.getElementById('setting-notion-url');
+    const notion_url = notionEl ? notionEl.value : '';
+    
     try {
         const res = await fetch('/api/settings', {
             method: 'PUT', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({total_budget, voyage_date})
+            body: JSON.stringify({total_budget, voyage_date, notion_url})
         });
         if(res.ok) { closeSettingsModal(); initApp(); }
     } catch(e) { alert("更新失敗"); }
@@ -143,6 +149,15 @@ function openSettingsModal() {
 function closeSettingsModal() {
     document.getElementById('settings-modal-content').classList.add('translate-y-full');
     setTimeout(() => document.getElementById('settings-modal').classList.add('hidden'), 300);
+}
+
+function gotoNotion() {
+    const url = document.getElementById('setting-notion-url').value;
+    if (!url) {
+        alert('請先貼上 Notion 網址並點擊更新！');
+        return;
+    }
+    window.open(url, '_blank');
 }
 
 // ===================================
@@ -701,14 +716,20 @@ async function runOcr() {
         document.getElementById('ocr-progress-bar').style.width = '100%';
         document.getElementById('ocr-japanese-text').textContent = japanese || '（未偵測到文字）';
         document.getElementById('ocr-translated-text').textContent = chinese || '（無翻譯）';
+        
+        // 成功後隱藏進度條，顯示結果
+        document.getElementById('ocr-progress-box').classList.add('hidden');
         document.getElementById('ocr-result-box').classList.remove('hidden');
 
     } catch (err) {
         console.error('OCR error:', err);
-        document.getElementById('ocr-status-text').textContent = `❌ ${err.message}`;
-        document.getElementById('ocr-scan-btn').classList.remove('hidden');
-    } finally {
         document.getElementById('ocr-progress-box').classList.add('hidden');
+        document.getElementById('ocr-scan-btn').classList.remove('hidden');
+        
+        // 將錯誤顯示在結果面板
+        document.getElementById('ocr-japanese-text').textContent = '無';
+        document.getElementById('ocr-translated-text').textContent = `❌ 解析發生錯誤：${err.message}。請重試或更換照片。`;
+        document.getElementById('ocr-result-box').classList.remove('hidden');
     }
 }
 

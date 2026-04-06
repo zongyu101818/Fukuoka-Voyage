@@ -104,9 +104,19 @@ app.get('/api/settings', async (req, res) => {
 
 app.put('/api/settings', async (req, res) => {
     try {
-        const { total_budget, voyage_date } = req.body;
+        const { total_budget, voyage_date, notion_url } = req.body;
         if(total_budget) await supabaseFetch('settings?key=eq.total_budget', 'PATCH', { value: String(total_budget) });
         if(voyage_date) await supabaseFetch('settings?key=eq.voyage_date', 'PATCH', { value: String(voyage_date) });
+        
+        // 支援新增的 Notion URL 儲存 (使用 Upsert 機制)
+        if(notion_url !== undefined) {
+            const getRes = await supabaseFetch('settings?key=eq.notion_url');
+            if (getRes.length > 0) {
+                await supabaseFetch('settings?key=eq.notion_url', 'PATCH', { value: String(notion_url) });
+            } else {
+                await supabaseFetch('settings', 'POST', { key: 'notion_url', value: String(notion_url) });
+            }
+        }
         res.json({ success: true });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });

@@ -596,6 +596,16 @@
                         <input type="date" id="setting-date"
                             class="w-full bg-dark-200/70 backdrop-blur-xl border border-primary/20 border-white/5 rounded p-2 font-bold focus:outline-none focus:border-primary">
                     </div>
+                    <div class="pt-4 border-t border-white/10">
+                        <label class="block text-sm font-bold text-gray-300 mb-1">Notion 旅遊頁面網址</label>
+                        <div class="flex gap-2">
+                            <input type="url" id="setting-notion-url" placeholder="https://notion.so/..."
+                                class="flex-1 bg-dark-200/70 backdrop-blur-xl border border-primary/20 border-white/5 rounded p-2 font-bold focus:outline-none focus:border-primary text-xs">
+                            <button onclick="gotoNotion()" class="bg-blue-600 hover:bg-blue-500 text-white rounded px-4 font-bold tracking-wider transition active:scale-95 text-xs flex items-center justify-center shrink-0">
+                                傳送
+                            </button>
+                        </div>
+                    </div>
                     <button onclick="saveSettings()"
                         class="w-full bg-dark-100/90 backdrop-blur-md text-white font-bold tracking-wider text-lg py-3 rounded-xl hover:bg-black active:scale-95 mt-4 transition border border-primary/20 border-white/10">
                         更新航海計畫
