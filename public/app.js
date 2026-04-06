@@ -608,31 +608,39 @@ async function fileToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
+            const rawBase64 = e.target.result.split(',')[1];
             const img = new Image();
+            
             img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let w = img.width;
-                let h = img.height;
-                // 最大寬高限制在 1200px 確保傳輸超快且不過大
-                const MAX_DIMENSION = 1200;
-                if (w > h && w > MAX_DIMENSION) {
-                    h = Math.round(h * (MAX_DIMENSION / w));
-                    w = MAX_DIMENSION;
-                } else if (h > MAX_DIMENSION) {
-                    w = Math.round(w * (MAX_DIMENSION / h));
-                    h = MAX_DIMENSION;
+                try {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width;
+                    let h = img.height;
+                    const MAX_DIMENSION = 1200;
+                    if (w > h && w > MAX_DIMENSION) {
+                        h = Math.round(h * (MAX_DIMENSION / w));
+                        w = MAX_DIMENSION;
+                    } else if (h > MAX_DIMENSION) {
+                        w = Math.round(w * (MAX_DIMENSION / h));
+                        h = MAX_DIMENSION;
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    resolve(dataUrl.split(',')[1]);
+                } catch (canvasErr) {
+                    // 如果 Canvas 壓縮失敗，退回使用原始圖檔
+                    resolve(rawBase64);
                 }
-                
-                canvas.width = w;
-                canvas.height = h;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, w, h);
-                
-                // 轉為 jpeg base64, 品質 0.8
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                resolve(dataUrl.split(',')[1]);
             };
-            img.onerror = reject;
+            
+            img.onerror = () => {
+                // iOS 不支援 HEIC 放入 img，會觸發 error，在此直接退回原始圖檔
+                resolve(rawBase64);
+            };
+            
             img.src = e.target.result;
         };
         reader.onerror = reject;
