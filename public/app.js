@@ -532,15 +532,52 @@ async function resetChecklist() {
 }
 
 // ===================================
-// 密碼解析所 (OCR 日文掃描翻譯)
+// 密碼解析所 (Gemini AI 日文掃描翻譯)
 // ===================================
 let ocrImageFile = null;
+
+// --- Gemini API Key 管理 ---
+function getGeminiKey() {
+    return localStorage.getItem('gemini_api_key') || '';
+}
+function saveGeminiKey(key) {
+    localStorage.setItem('gemini_api_key', key.trim());
+}
+
+function applyGeminiKey() {
+    const input = document.getElementById('gemini-key-input');
+    const status = document.getElementById('gemini-key-status');
+    const key = input.value.trim();
+    if (!key || !key.startsWith('AIza')) {
+        status.textContent = '⚠️ 格式不對，Key 應以 AIza 開頭';
+        status.style.color = '#f87171';
+        return;
+    }
+    saveGeminiKey(key);
+    input.value = ''; // 清空欄位保護隱私
+    status.textContent = '✅ API Key 已儲存！可以開始掃描囉';
+    status.style.color = '#4ade80';
+    // 把 input 欄位顯示成已保存狀態
+    input.placeholder = '✓ Key 已儲存（點擊可更換）';
+}
 
 function openOcrModal() {
     const m = document.getElementById('ocr-modal');
     const c = document.getElementById('ocr-modal-content');
     m.classList.remove('hidden');
     setTimeout(() => c.classList.remove('translate-y-full'), 10);
+    // 如果已有 key，更新狀態顯示
+    const key = getGeminiKey();
+    const status = document.getElementById('gemini-key-status');
+    const input = document.getElementById('gemini-key-input');
+    if (key) {
+        status.textContent = '✅ API Key 已就緒，上傳圖片即可解析';
+        status.style.color = '#4ade80';
+        input.placeholder = '✓ Key 已儲存（點擊可更換）';
+    } else {
+        status.textContent = '⚠️ 請先輸入 Gemini API Key 才能使用';
+        status.style.color = '#facc15';
+    }
 }
 
 function closeOcrModal() {
@@ -566,127 +603,122 @@ function handleOcrFile(event) {
     reader.readAsDataURL(file);
 }
 
-// 圖片預處理: 灰階 + 對比提升 → 讓 Tesseract 更容易識別日文
-async function preprocessImageForOcr(file) {
-    return new Promise((resolve) => {
-        const img = new Image();
-        const url = URL.createObjectURL(file);
-        img.onload = () => {
-            // 建立 Canvas，最大寬度 2000px（太小會影響辨識率）
-            const MAX = 2000;
-            let w = img.width, h = img.height;
-            if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
-            
-            const canvas = document.createElement('canvas');
-            canvas.width = w;
-            canvas.height = h;
-            const ctx = canvas.getContext('2d');
-            
-            // 1. 畫原圖
-            ctx.drawImage(img, 0, 0, w, h);
-            
-            // 2. 灰階化 + 對比度增強
-            const imageData = ctx.getImageData(0, 0, w, h);
-            const data = imageData.data;
-            for (let i = 0; i < data.length; i += 4) {
-                // 灰階
-                const gray = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
-                // 對比增強 (factor=1.5)
-                const factor = 1.5;
-                const enhanced = Math.min(255, Math.max(0, factor * (gray - 128) + 128));
-                data[i] = data[i+1] = data[i+2] = enhanced;
-            }
-            ctx.putImageData(imageData, 0, 0);
-            
-            canvas.toBlob((blob) => {
-                URL.revokeObjectURL(url);
-                resolve(blob);
-            }, 'image/png');
-        };
-        img.src = url;
+// 圖片轉 base64（去掉 data:... 前綴）
+async function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
     });
 }
 
+// 主要 OCR 入口
 async function runOcr() {
     if (!ocrImageFile) return;
+
+    const apiKey = getGeminiKey();
+    if (!apiKey) {
+        const status = document.getElementById('gemini-key-status');
+        status.textContent = '❌ 請先輸入 Gemini API Key！';
+        status.style.color = '#f87171';
+        return;
+    }
 
     document.getElementById('ocr-scan-btn').classList.add('hidden');
     document.getElementById('ocr-result-box').classList.add('hidden');
     document.getElementById('ocr-progress-box').classList.remove('hidden');
-    document.getElementById('ocr-progress-bar').style.width = '0%';
-    document.getElementById('ocr-status-text').textContent = '🖼️ 預處理圖片中...';
+    document.getElementById('ocr-progress-bar').style.width = '20%';
+    document.getElementById('ocr-status-text').textContent = '🤖 準備圖片中...';
 
     try {
-        // 預處理圖片
-        const processedBlob = await preprocessImageForOcr(ocrImageFile);
-        document.getElementById('ocr-status-text').textContent = '⚙️ 初始化解析引擎...';
+        // 轉換圖片為 base64
+        const base64 = await fileToBase64(ocrImageFile);
+        document.getElementById('ocr-progress-bar').style.width = '50%';
+        document.getElementById('ocr-status-text').textContent = '✨ Gemini AI 解析中，請稍候...';
 
-        const result = await Tesseract.recognize(
-            processedBlob,
-            'jpn+jpn_vert',   // 同時支援橫排和直排日文
+        // 呼叫 Gemini 1.5 Flash API（同時辨識 + 翻譯）
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
             {
-                logger: (m) => {
-                    if (m.status === 'recognizing text') {
-                        const pct = Math.round(m.progress * 100);
-                        document.getElementById('ocr-progress-bar').style.width = pct + '%';
-                        document.getElementById('ocr-status-text').textContent = `🔍 掃描日文中... ${pct}%`;
-                    } else if (m.status === 'loading tesseract core') {
-                        document.getElementById('ocr-status-text').textContent = '📦 載入識別核心...';
-                    } else if (m.status === 'loading language traineddata') {
-                        document.getElementById('ocr-status-text').textContent = '📖 載入日文語言模型...';
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [
+                            {
+                                text: '請辨識這張圖片中的所有日文文字（包含漢字、平假名、片假名），並翻譯成繁體中文。\n\n請嚴格只回應以下 JSON 格式，不要加入任何其他說明文字：\n{"japanese":"日文原文（保持換行與格式）","chinese":"繁體中文翻譯（保持對應結構）"}'
+                            },
+                            {
+                                inline_data: {
+                                    mime_type: ocrImageFile.type || 'image/jpeg',
+                                    data: base64
+                                }
+                            }
+                        ]
+                    }],
+                    generationConfig: {
+                        temperature: 0.1,
+                        maxOutputTokens: 2048
                     }
-                },
-                tessedit_pageseg_mode: Tesseract.PSM.AUTO,  // 自動版面分析
-                tessedit_ocr_engine_mode: Tesseract.OEM.LSTM_ONLY, // 使用神經網路引擎
+                })
             }
         );
 
-        const japaneseText = result.data.text.trim();
+        document.getElementById('ocr-progress-bar').style.width = '90%';
 
-        if (!japaneseText) {
-            document.getElementById('ocr-status-text').textContent = '⚠️ 未辨識到文字，請換清晰的圖片試試';
-            document.getElementById('ocr-scan-btn').classList.remove('hidden');
-            document.getElementById('ocr-progress-box').classList.add('hidden');
-            return;
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            const msg = errData?.error?.message || `HTTP ${response.status}`;
+            if (response.status === 400 || response.status === 403) {
+                // Key 可能失效
+                localStorage.removeItem('gemini_api_key');
+                throw new Error(`API Key 無效或超出配額，請重新輸入（${msg}）`);
+            }
+            throw new Error(`Gemini API 錯誤：${msg}`);
         }
 
-        document.getElementById('ocr-japanese-text').textContent = japaneseText;
-        document.getElementById('ocr-progress-bar').style.width = '100%';
-        document.getElementById('ocr-status-text').textContent = '✅ 日文辨識完成，翻譯中...';
-        document.getElementById('ocr-result-box').classList.remove('hidden');
-        document.getElementById('ocr-translated-text').textContent = '翻譯中，請稍候...';
+        const data = await response.json();
+        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-        await translateJaToZhTW(japaneseText);
+        // 解析 JSON 回應
+        let japanese = '', chinese = '';
+        try {
+            const jsonMatch = rawText.match(/\{[\s\S]*?\}/);
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                japanese = (parsed.japanese || '').trim();
+                chinese = (parsed.chinese || '').trim();
+            } else {
+                // Gemini 有時直接回文字，非 JSON
+                japanese = rawText.trim();
+                chinese = '（AI 回應格式不標準，僅顯示原始辨識結果）';
+            }
+        } catch (e) {
+            japanese = rawText.trim();
+            chinese = '（翻譯格式解析失敗，請重試）';
+        }
+
+        document.getElementById('ocr-progress-bar').style.width = '100%';
+        document.getElementById('ocr-japanese-text').textContent = japanese || '（未偵測到日文文字）';
+        document.getElementById('ocr-translated-text').textContent = chinese || '（翻譯結果為空）';
+        document.getElementById('ocr-result-box').classList.remove('hidden');
 
     } catch (err) {
-        console.error('OCR error:', err);
-        document.getElementById('ocr-status-text').textContent = '❌ 解析失敗，請重試';
+        console.error('Gemini OCR error:', err);
+        const status = document.getElementById('ocr-status-text');
+        status.textContent = `❌ ${err.message}`;
         document.getElementById('ocr-scan-btn').classList.remove('hidden');
+
+        // Key 失效時重置顯示
+        if (err.message.includes('API Key') || err.message.includes('Key')) {
+            const keyStatus = document.getElementById('gemini-key-status');
+            keyStatus.textContent = '❌ Key 已失效，請重新輸入';
+            keyStatus.style.color = '#f87171';
+            document.getElementById('gemini-key-input').placeholder = '貼上 Gemini API Key (AIza...)';
+        }
     } finally {
         document.getElementById('ocr-progress-box').classList.add('hidden');
-    }
-
-}
-
-async function translateJaToZhTW(text) {
-    const translatedEl = document.getElementById('ocr-translated-text');
-    const truncated = text.length > 500 ? text.substring(0, 500) + '...' : text;
-
-    try {
-        const encoded = encodeURIComponent(truncated);
-        const res = await fetch(`https://api.mymemory.translated.net/get?q=${encoded}&langpair=ja|zh-TW`);
-        const data = await res.json();
-
-        if (data.responseStatus === 200 && data.responseData && data.responseData.translatedText) {
-            let translated = data.responseData.translatedText;
-            if (translated.length < 2) translated = '（翻譯結果為空，請確認圖片包含日文文字）';
-            translatedEl.textContent = translated;
-        } else {
-            translatedEl.textContent = '（翻譯服務暫時無法使用，原文已顯示於上方）';
-        }
-    } catch (e) {
-        console.warn('Translation failed:', e);
-        translatedEl.textContent = '（網路無法連線，請確認網路後重試）';
     }
 }
 
@@ -702,7 +734,7 @@ function resetOcrModal() {
     document.getElementById('ocr-progress-box').classList.add('hidden');
     document.getElementById('ocr-progress-bar').style.width = '0%';
     document.getElementById('ocr-japanese-text').textContent = '';
-    document.getElementById('ocr-translated-text').textContent = '翻譯中...';
+    document.getElementById('ocr-translated-text').textContent = '';
 }
 
 function copyText(elementId) {
@@ -710,14 +742,18 @@ function copyText(elementId) {
     if (!el) return;
     const text = el.textContent;
     if (!text) return;
+
+    // 找到對應按鈕（用 ID 直接對應）
+    const btnId = elementId === 'ocr-japanese-text' ? 'copy-jp-btn' : 'copy-tw-btn';
+    const btn = document.getElementById(btnId);
+
     navigator.clipboard.writeText(text).then(() => {
-        // 找到對應複製按鈕顯示回饋
-        const btn = el.closest('.bg-dark-200\\/60, .bg-gradient-to-br')?.querySelector('button[onclick]');
-        if (!btn) return;
-        const orig = btn.textContent;
-        btn.textContent = '✓ 已複製！';
-        btn.style.color = '#4ade80';
-        setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
+        if (btn) {
+            const orig = btn.textContent;
+            btn.textContent = '✓ 已複製！';
+            btn.style.color = '#4ade80';
+            setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
+        }
     }).catch(() => {
         const ta = document.createElement('textarea');
         ta.value = text;
@@ -727,3 +763,5 @@ function copyText(elementId) {
         document.body.removeChild(ta);
     });
 }
+
+

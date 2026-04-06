@@ -509,7 +509,6 @@
                             <label class="block text-sm font-bold text-gray-300">金庫總預算 (日圓)</label>
                             <span class="text-xs font-bold tracking-wider text-primary bg-red-100 px-2 rounded"
                                 id="setting-budget-twd">約 NT$ --</span>
-                        </div>
                         <input type="number" id="setting-budget" oninput="updateSettingBudgetTWD()"
                             class="w-full bg-dark-200/70 backdrop-blur-xl border border-primary/20 border-white/5 rounded p-2 font-bold focus:outline-none focus:border-primary">
                     </div>
@@ -528,7 +527,7 @@
             </div>
         </div>
 
-        <!-- MODAL: 密碼解析 - OCR 日文掃描翻譯 -->
+        <!-- MODAL: 密碼解析 - OCR 日文掃描翻譯 (Gemini AI) -->
         <div id="ocr-modal" class="fixed inset-0 z-[80] flex items-end sm:items-center justify-center hidden">
             <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="closeOcrModal()"></div>
             <div class="bg-dark-300 w-full max-w-md rounded-t-3xl sm:rounded-2xl border-t border-primary/60 sm:border border-primary/30 shadow-[0_0_60px_rgba(126,34,206,0.5)] relative z-10 transition-transform duration-300 transform translate-y-full overflow-hidden"
@@ -538,11 +537,36 @@
                 <div class="bg-gradient-to-r from-primary/80 to-dark-200/80 px-6 py-4 flex justify-between items-center border-b border-white/10">
                     <h3 class="text-xl font-bold tracking-wider text-secondary flex items-center gap-2">
                         <i class="ph-fill ph-scan text-2xl"></i> 密碼解析所
+                        <span class="text-[10px] bg-secondary/20 text-secondary border border-secondary/40 px-2 py-0.5 rounded-full ml-1">Gemini AI</span>
                     </h3>
                     <button onclick="closeOcrModal()" class="w-8 h-8 flex items-center justify-center bg-black/40 text-white rounded-full font-bold hover:bg-black/70 transition">✕</button>
                 </div>
 
                 <div class="p-5 space-y-4 max-h-[80vh] overflow-y-auto custom-scrollbar">
+
+                    <!-- Gemini API Key 設定區 -->
+                    <div id="gemini-key-section" class="bg-dark-400/80 border border-secondary/30 rounded-xl p-3">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-secondary flex items-center gap-1.5">
+                                <i class="ph-fill ph-sparkle"></i> Gemini AI 解析引擎
+                            </span>
+                            <a href="https://aistudio.google.com/app/apikey" target="_blank"
+                                class="text-[10px] text-primary underline flex items-center gap-1">
+                                <i class="ph-bold ph-arrow-square-out text-xs"></i>免費取得 Key
+                            </a>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="password" id="gemini-key-input"
+                                placeholder="貼上 Gemini API Key (AIza...)"
+                                class="flex-1 bg-dark-200/70 border border-white/10 rounded-lg px-2 py-1.5 text-xs font-bold text-gray-100 focus:outline-none focus:border-secondary placeholder-gray-600">
+                            <button onclick="applyGeminiKey()"
+                                class="bg-secondary text-dark-400 font-bold text-xs px-3 rounded-lg hover:bg-yellow-400 active:scale-95 transition whitespace-nowrap">
+                                套用
+                            </button>
+                        </div>
+                        <p id="gemini-key-status" class="text-[10px] mt-1.5 font-bold"></p>
+                    </div>
+
                     <!-- 上傳區域 -->
                     <div id="ocr-drop-zone"
                         onclick="document.getElementById('ocr-file-input').click()"
@@ -560,14 +584,14 @@
 
                     <!-- 掃描按鈕 -->
                     <button id="ocr-scan-btn" onclick="runOcr()" class="hidden w-full bg-primary hover:bg-purple-700 active:scale-95 text-secondary font-bold tracking-wider text-lg py-3 rounded-xl transition shadow-wanted flex items-center justify-center gap-2">
-                        <i class="ph-fill ph-magnifying-glass text-xl"></i> 開始解析日文！
+                        <i class="ph-fill ph-sparkle text-xl"></i> AI 解析日文！
                     </button>
 
                     <!-- 進度條 -->
                     <div id="ocr-progress-box" class="hidden">
                         <p id="ocr-status-text" class="text-xs text-gray-400 font-bold mb-2 text-center tracking-wider">正在解析中，請稍候...</p>
                         <div class="w-full bg-dark-200 rounded-full h-2 overflow-hidden">
-                            <div id="ocr-progress-bar" class="h-2 bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-300" style="width:0%"></div>
+                            <div id="ocr-progress-bar" class="h-2 bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500" style="width:0%"></div>
                         </div>
                     </div>
 
@@ -577,7 +601,7 @@
                         <div class="bg-dark-200/60 border border-white/10 rounded-xl p-4">
                             <div class="flex justify-between items-center mb-2">
                                 <span class="text-xs font-bold text-gray-400 tracking-wider uppercase">🇯🇵 日文原文</span>
-                                <button onclick="copyText('ocr-japanese-text')" class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded hover:bg-primary/20 transition active:scale-95">複製</button>
+                                <button id="copy-jp-btn" onclick="copyText('ocr-japanese-text')" class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded hover:bg-primary/20 transition active:scale-95">複製</button>
                             </div>
                             <p id="ocr-japanese-text" class="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap font-sans"></p>
                         </div>
@@ -585,9 +609,9 @@
                         <div id="ocr-translation-box" class="bg-gradient-to-br from-primary/20 to-dark-300 border border-primary/40 rounded-xl p-4">
                             <div class="flex justify-between items-center mb-2">
                                 <span class="text-xs font-bold text-secondary tracking-wider uppercase">🇹🇼 繁體中文翻譯</span>
-                                <button onclick="copyText('ocr-translated-text')" class="text-[10px] font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded hover:bg-secondary/20 transition active:scale-95">複製</button>
+                                <button id="copy-tw-btn" onclick="copyText('ocr-translated-text')" class="text-[10px] font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded hover:bg-secondary/20 transition active:scale-95">複製</button>
                             </div>
-                            <p id="ocr-translated-text" class="text-sm text-gray-100 leading-relaxed whitespace-pre-wrap font-bold">翻譯中...</p>
+                            <p id="ocr-translated-text" class="text-sm text-gray-100 leading-relaxed whitespace-pre-wrap font-bold"></p>
                         </div>
                         <!-- 重新掃描按鈕 -->
                         <button onclick="resetOcrModal()" class="w-full bg-dark-200/50 border border-white/10 text-gray-300 font-bold py-2 rounded-xl hover:bg-dark-200 transition active:scale-95 text-sm">
